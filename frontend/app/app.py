@@ -5,7 +5,7 @@ from flask_login import LoginManager, login_manager, current_user, login_user, l
 from models import users, User
 
 # Login
-from forms import LoginForm
+from forms import LoginForm, RegisterForm
 
 app = Flask(__name__, static_url_path='')
 login_manager = LoginManager()
@@ -30,8 +30,8 @@ def login():
         return redirect(url_for('index'))
     else:
         error = None
-        form = LoginForm(None if requeest.method != 'POST' else request.form)
-        if request.method == "POST" and  form.validate():
+        form = LoginForm(None if request.method != 'POST' else request.form)
+        if request.method == "POST" and form.validate():
             if form.email.data != 'admin@um.es' or form.password.data != 'admin':
                 error = 'Invalid Credentials. Please try again.'
             else:
@@ -43,6 +43,17 @@ def login():
 
         return render_template('login.html', form=form,  error=error)
 
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    else:
+        error = None
+        form = RegisterForm(None if request.method != 'POST' else request.form)
+        if request.method == "POST" and form.validate():
+            return redirect(url_for('login'))
+        return render_template('register.html', form=form,  error=error)
 
 @app.route('/profile')
 @login_required
