@@ -15,7 +15,7 @@ login_manager.init_app(app) # Para mantener la sesión
 # Python ofrece varias formas de almacenar esto de forma segura, que
 # no cubriremos aquí.
 app.config['SECRET_KEY'] = 'qH1vprMjavek52cv7Lmfe1FoCexrrV8egFnB21jHhkuOHm8hJUe1hwn7pKEZQ1fioUzDb3sWcNK1pJVVIhyrgvFiIrceXpKJBFIn_i9-LTLBCc4cqaI3gjJJHU6kxuT8bnC7Ng'
-
+lista = ["a","b"]
 @app.route('/static/<path:path>')
 def serve_static(path):
     return send_from_directory('static', path)
@@ -54,6 +54,21 @@ def register():
         if request.method == "POST" and form.validate():
             return redirect(url_for('login'))
         return render_template('register.html', form=form,  error=error)
+
+@app.route('/bbdd')
+#@login_required
+def bbdd():
+    
+    return render_template('bbdd.html', bdList=lista, len=len(lista))
+
+@app.route('/postbd', methods=['POST'])
+#@login_required 
+def postdb():
+    #añadir la bbdd en el backend
+    database = request.form['database']
+    
+    lista.append(database)
+    return redirect(url_for('bbdd'))
 
 @app.route('/profile')
 @login_required
