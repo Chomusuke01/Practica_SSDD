@@ -28,7 +28,7 @@
     <!-- Table headers -->
         <th>
             <tr style="color: green; ">    
-            <td>Serial Number</td>
+            
             <td>Data Base Name</td>
     </tr>
         </th>
@@ -38,7 +38,7 @@
       
     <!-- table rows -->
     <tr>
-        <td>{{i}}</td>
+        
         <td>{{bdList[i]}}</td>
       
     {%endfor%}
@@ -46,11 +46,19 @@
     </tr>
       
     </table>
+    &nbsp;
     <div class="form-floating">
         <form action = "{{url_for('postdb')}}" method="post">
-            <input type="text" name="database"  placeholder="New data base name">
+            <input type="text" name="newDatabase"  placeholder="New data base name">
             <input type = "submit">
         </form>
-        
     </div>
+    &nbsp;
+    <div class="form-floating">
+        <form action = "{{url_for('deletedb')}}" method="post">
+            <input type="text" name="deleteDatabase"  placeholder="Database to delete">
+            <input type = "submit">
+        </form>
+    </div>
+
     {%endblock %}

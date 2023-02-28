@@ -52,23 +52,36 @@ def register():
         error = None
         form = RegisterForm(None if request.method != 'POST' else request.form)
         if request.method == "POST" and form.validate():
+            print (form.username.data)
+            print (form.password.data)
+            print (form.email.data)
+            
             return redirect(url_for('login'))
         return render_template('register.html', form=form,  error=error)
 
 @app.route('/bbdd')
-#@login_required
+@login_required
 def bbdd():
     
     return render_template('bbdd.html', bdList=lista, len=len(lista))
 
 @app.route('/postbd', methods=['POST'])
-#@login_required 
+@login_required 
 def postdb():
     #añadir la bbdd en el backend
-    database = request.form['database']
+    database = request.form['newDatabase']
     
     lista.append(database)
     return redirect(url_for('bbdd'))
+
+@app.route('/deletedb', methods=['POST'])
+@login_required
+def deletedb():
+
+    database = request.form['deleteDatabase']
+    lista.remove(database)
+    return redirect(url_for('bbdd'))
+
 
 @app.route('/profile')
 @login_required
