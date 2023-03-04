@@ -50,6 +50,7 @@ public class MongoUserDAO implements IUserDAO
         		.withCodecRegistry(pojoCodecRegistry);
         	return database.getCollection("users", User.class);
         });
+        collection.get().dropIndexes(); /// PREGUNTAR, IMPORTANTE.
     }
 
     @Override
