@@ -1,5 +1,7 @@
 package es.um.sisdist.models;
 
+import java.util.ArrayList;
+
 import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
@@ -9,11 +11,20 @@ public class UserDTO
     private String email;
     private String password;
     private String name;
-
+    private ArrayList<String> bbdd;
     private String token;
-
+    
     private int visits;
 
+    
+    public ArrayList<String> getBbdd(){
+    	return new ArrayList<>(bbdd);
+    }
+    
+    public void setBbdd(ArrayList<String> bbdd) {
+    	this.bbdd = new ArrayList<>(bbdd);
+    }
+    
     /**
      * @return the id
      */
@@ -110,7 +121,7 @@ public class UserDTO
         this.visits = visits;
     }
 
-    public UserDTO(String id, String email, String password, String name, String tOKEN, int visits)
+    public UserDTO(String id, String email, String password, String name, String tOKEN, int visits, ArrayList<String> bbdd)
     {
         super();
         this.id = id;
@@ -119,6 +130,7 @@ public class UserDTO
         this.name = name;
         token = tOKEN;
         this.visits = visits;
+        this.bbdd = new ArrayList<>(bbdd);
     }
 
     public UserDTO()

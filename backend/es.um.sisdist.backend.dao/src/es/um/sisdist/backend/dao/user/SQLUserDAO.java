@@ -95,4 +95,10 @@ public class SQLUserDAO implements IUserDAO
 		return Optional.empty();
 	}
 
+	@Override
+	public void updateVisits(User u) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

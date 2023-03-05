@@ -5,6 +5,7 @@ package es.um.sisdist.backend.dao.user;
 
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
@@ -22,6 +23,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 import es.um.sisdist.backend.dao.models.User;
+import es.um.sisdist.backend.dao.models.utils.UserUtils;
 import es.um.sisdist.backend.dao.utils.Lazy;
 
 /**
@@ -75,11 +77,17 @@ public class MongoUserDAO implements IUserDAO
 			return Optional.empty();
 		}
 		
-		User u = new User(id, email, password, name, token, 1);
+		User u = new User(id, email, UserUtils.md5pass(password), name, token, 0);
 		
 		collection.get().insertOne(u);
 		
 		return Optional.of(u);
+	}
+
+	@Override
+	public void updateVisits(User u) {
+		
+		collection.get().updateOne(eq("email", u.getEmail()), set("visits", u.getVisits() + 1));
 	}
 
 }

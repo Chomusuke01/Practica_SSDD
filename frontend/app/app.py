@@ -1,5 +1,6 @@
 from flask import Flask, render_template, send_from_directory, url_for, request, redirect
 from flask_login import LoginManager, login_manager, current_user, login_user, login_required, logout_user
+import requests
 
 # Usuarios
 from models import users, User
@@ -32,14 +33,21 @@ def login():
         error = None
         form = LoginForm(None if request.method != 'POST' else request.form)
         if request.method == "POST" and form.validate():
-            if form.email.data != 'admin@um.es' or form.password.data != 'admin':
-                error = 'Invalid Credentials. Please try again.'
-            else:
-                user = User(1, 'admin', form.email.data.encode('utf-8'),
+            
+            data ={
+                "email": form.email.data,
+                "password": form.password.data
+            }
+            response = requests.post('http://192.168.18.26:8080/Service/checkLogin', json=data) #Preguntar direccion IP
+            if response.status_code == 200:
+
+                user = User(1, 'admin', form.email.data.encode('utf-8'), ## Preguntar campos user
                             form.password.data.encode('utf-8'))
                 users.append(user)
                 login_user(user, remember=form.remember_me.data)
                 return redirect(url_for('index'))
+            else:
+                error = 'Invalid credentials. Please try again'
 
         return render_template('login.html', form=form,  error=error)
 
@@ -52,11 +60,22 @@ def register():
         error = None
         form = RegisterForm(None if request.method != 'POST' else request.form)
         if request.method == "POST" and form.validate():
-            print (form.username.data)
-            print (form.password.data)
-            print (form.email.data)
             
-            return redirect(url_for('login'))
+            data ={
+                "email": form.email.data,
+                "id": form.username.data,
+                "name": form.name.data,
+                "password": form.password.data,
+                "token": "testToken"
+            }
+
+            response = requests.post('http://192.168.18.26:8080/Service/u', json=data) #Preguntar direccion IP
+
+            if response.status_code == 201:
+                return redirect(url_for('login'))
+            
+            error = "User already registered"
+            
         return render_template('register.html', form=form,  error=error)
 
 @app.route('/bbdd')

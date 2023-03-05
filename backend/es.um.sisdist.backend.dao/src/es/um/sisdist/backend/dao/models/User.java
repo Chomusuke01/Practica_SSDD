@@ -3,6 +3,8 @@
  */
 package es.um.sisdist.backend.dao.models;
 
+import java.util.ArrayList;
+
 import es.um.sisdist.backend.dao.models.utils.UserUtils;
 
 public class User
@@ -13,9 +15,17 @@ public class User
     private String name;
 
     private String token;
-
+    private ArrayList<String> bbdd;
     private int visits;
 
+    public ArrayList<String> getBbdd(){
+    	return new ArrayList<>(bbdd);
+    }
+    
+    public void setBbdd(ArrayList<String> bbdd) {
+    	this.bbdd = new ArrayList<>(bbdd);
+    }
+    
     /**
      * @return the id
      */
@@ -126,6 +136,7 @@ public class User
         this.name = name;
         token = tOKEN;
         this.visits = visits;
+        this.bbdd = new ArrayList<>();
     }
 
     @Override
