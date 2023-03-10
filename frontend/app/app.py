@@ -17,6 +17,7 @@ login_manager.init_app(app) # Para mantener la sesión
 # no cubriremos aquí.
 app.config['SECRET_KEY'] = 'qH1vprMjavek52cv7Lmfe1FoCexrrV8egFnB21jHhkuOHm8hJUe1hwn7pKEZQ1fioUzDb3sWcNK1pJVVIhyrgvFiIrceXpKJBFIn_i9-LTLBCc4cqaI3gjJJHU6kxuT8bnC7Ng'
 lista = ["a","b"]
+backendURL = "backend-rest:8080"
 @app.route('/static/<path:path>')
 def serve_static(path):
     return send_from_directory('static', path)
@@ -38,7 +39,7 @@ def login():
                 "email": form.email.data,
                 "password": form.password.data
             }
-            response = requests.post('http://192.168.18.26:8080/Service/checkLogin', json=data) #Preguntar direccion IP
+            response = requests.post("http://" + backendURL + "/Service/checkLogin", json=data)
             if response.status_code == 200:
 
                 user = User(1, 'admin', form.email.data.encode('utf-8'), ## Preguntar campos user
@@ -69,7 +70,7 @@ def register():
                 "token": "testToken"
             }
 
-            response = requests.post('http://192.168.18.26:8080/Service/u', json=data) #Preguntar direccion IP
+            response = requests.post("http://" + backendURL + "/Service/u", json=data) 
 
             if response.status_code == 201:
                 return redirect(url_for('login'))
