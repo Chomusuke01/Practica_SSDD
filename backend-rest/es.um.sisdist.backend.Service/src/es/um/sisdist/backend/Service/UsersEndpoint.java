@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import es.um.sisdist.backend.Service.impl.AppLogicImpl;
 import es.um.sisdist.backend.dao.models.User;
+import es.um.sisdist.models.BD_DTO;
 import es.um.sisdist.models.UserDTO;
 import es.um.sisdist.models.UserDTOUtils;
 import jakarta.ws.rs.Consumes;
@@ -32,12 +33,18 @@ public class UsersEndpoint
         return UserDTOUtils.toDTO(impl.getUserByEmail(username).orElse(null));
     }
    
-    @GET
-    @Path("/hola")
-    @Produces(MediaType.TEXT_PLAIN)
-    
-    public String hola() {
-    	return "HOLA";
+    @POST
+    @Path("/{id}/db")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addDB(@PathParam("id") String userID, BD_DTO bdDto) {
+    	
+    	Optional<String> bdID= impl.newBD(bdDto, userID);
+    	
+    	if (bdID.isPresent()) {
+    		return Response.created(UriBuilder.fromPath("/u/{id}/db/{DBID}").build(userID,bdID.get())).build();
+    	}
+    	return Response.status(Status.FORBIDDEN).build();
     }
    
     

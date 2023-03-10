@@ -10,7 +10,9 @@ public interface IUserDAO
 
     public Optional<User> getUserByEmail(String id);
     
-    public Optional<User> newUser(String name, String id, String email, String password, String token);
+    public Optional<User> newUser(String name, String id, String email, String password);
     
     public void updateVisits(User u);
+    
+    public Optional<String> newBBDD(String userID, String bdID);
 }

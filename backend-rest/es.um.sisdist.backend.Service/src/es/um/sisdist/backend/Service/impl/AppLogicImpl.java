@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import es.um.sisdist.backend.grpc.GrpcServiceGrpc;
 import es.um.sisdist.backend.grpc.PingRequest;
+import es.um.sisdist.models.BD_DTO;
 import es.um.sisdist.models.UserDTO;
 import es.um.sisdist.backend.dao.DAOFactoryImpl;
 import es.um.sisdist.backend.dao.IDAOFactory;
@@ -74,7 +75,11 @@ public class AppLogicImpl
 
     public Optional<User> newUser(UserDTO uo){
     	
-    	return dao.newUser(uo.getName(), uo.getId(), uo.getEmail(), uo.getPassword(), uo.getToken());
+    	return dao.newUser(uo.getName(), uo.getId(), uo.getEmail(), uo.getPassword());
+    }
+    
+    public Optional<String> newBD(BD_DTO bdDto, String userID) {
+    	return dao.newBBDD(userID, bdDto.getDbname());
     }
     
     public boolean ping(int v)

@@ -90,7 +90,7 @@ public class SQLUserDAO implements IUserDAO
     }
 
 	@Override
-	public Optional<User> newUser(String name, String id, String email, String password, String token) {
+	public Optional<User> newUser(String name, String id, String email, String password) {
 		// TODO Auto-generated method stub
 		return Optional.empty();
 	}
@@ -99,6 +99,12 @@ public class SQLUserDAO implements IUserDAO
 	public void updateVisits(User u) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Optional<String> newBBDD(String userID, String bdID) {
+		// TODO Auto-generated method stub
+		return Optional.empty();
 	}
 
 }

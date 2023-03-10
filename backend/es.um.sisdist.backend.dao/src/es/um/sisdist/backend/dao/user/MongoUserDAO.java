@@ -6,8 +6,12 @@ package es.um.sisdist.backend.dao.user;
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
+import static com.mongodb.client.model.Updates.push;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+import org.bson.codecs.pojo.Conventions;
+import static java.util.Arrays.*;
+
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -36,7 +40,7 @@ public class MongoUserDAO implements IUserDAO
 
     public MongoUserDAO()
     {
-        CodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
+        CodecProvider pojoCodecProvider = PojoCodecProvider.builder().conventions(asList(Conventions.ANNOTATION_CONVENTION)).automatic(true).build();
         CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
 
         // Replace the uri string with your MongoDB deployment's connection string
@@ -52,7 +56,7 @@ public class MongoUserDAO implements IUserDAO
         		.withCodecRegistry(pojoCodecRegistry);
         	return database.getCollection("users", User.class);
         });
-        collection.get().dropIndexes(); /// PREGUNTAR, IMPORTANTE.
+        //collection.get().dropIndexes(); /// PREGUNTAR, IMPORTANTE.
     }
 
     @Override
@@ -70,14 +74,14 @@ public class MongoUserDAO implements IUserDAO
     }
 
 	@Override
-	public Optional<User> newUser(String name, String id, String email, String password, String token) {
+	public Optional<User> newUser(String name, String id, String email, String password) {
 		
 		Optional<User> user = getUserByEmail(email);
 		if (user.isPresent()) {
 			return Optional.empty();
 		}
 		
-		User u = new User(id, email, UserUtils.md5pass(password), name, token, 0);
+		User u = new User(id, email, UserUtils.md5pass(password), name, UserUtils.md5pass(id), 0);
 		
 		collection.get().insertOne(u);
 		
@@ -88,6 +92,22 @@ public class MongoUserDAO implements IUserDAO
 	public void updateVisits(User u) {
 		
 		collection.get().updateOne(eq("email", u.getEmail()), set("visits", u.getVisits() + 1));
+	}
+
+	@Override
+	public Optional<String> newBBDD(String userID, String bdID) {
+		
+		Optional<User> user = getUserById(userID);
+		
+		if (user.isEmpty()) {
+			return Optional.empty();
+		}
+		
+		// TODO Comprobar que la bbdd tampoco existe ya y crearla
+		
+		collection.get().updateOne(eq("uid", userID), push("bbdd", bdID));
+		
+		return Optional.of(bdID);
 	}
 
 }
