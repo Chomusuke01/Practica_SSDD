@@ -20,4 +20,6 @@ public interface IUserDAO
     public void updateVisits(User u);
     
     public Optional<String> newBBDD(String userID, String bdID, ArrayList<KeyValue> kv);
+    
+    public Optional <Userdb>getDatabases  (String userID, String bdID);
 }

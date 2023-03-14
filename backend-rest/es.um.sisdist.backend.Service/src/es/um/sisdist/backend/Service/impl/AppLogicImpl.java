@@ -14,6 +14,7 @@ import es.um.sisdist.models.UserDTO;
 import es.um.sisdist.backend.dao.DAOFactoryImpl;
 import es.um.sisdist.backend.dao.IDAOFactory;
 import es.um.sisdist.backend.dao.models.User;
+import es.um.sisdist.backend.dao.models.Userdb;
 import es.um.sisdist.backend.dao.models.utils.UserUtils;
 import es.um.sisdist.backend.dao.user.IUserDAO;
 import io.grpc.ManagedChannel;
@@ -81,6 +82,12 @@ public class AppLogicImpl
     
     public Optional<String> newBD(BD_DTO bdDto, String userID) {
     	return dao.newBBDD(userID, bdDto.getDbname(), BD_DTOUtils.fromDTO(bdDto));
+    }
+    
+    public Optional<BD_DTO> getDatabases(String userID, String bdID){
+    	Optional<Userdb> userdb = dao.getDatabases(userID, bdID);
+    	BD_DTO bddto = BD_DTOUtils.toBD_DTO(userdb.get());
+    	return Optional.of(bddto);
     }
     
     public boolean ping(int v)

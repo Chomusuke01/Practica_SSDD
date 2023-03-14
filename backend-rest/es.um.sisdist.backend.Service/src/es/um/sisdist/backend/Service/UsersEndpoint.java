@@ -61,4 +61,12 @@ public class UsersEndpoint
     	return Response.status(Status.FORBIDDEN).build();
     }
     
+    @GET
+    @Path("/{id}/db/{dbid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public BD_DTO getDatabases(@PathParam("id") String userID, @PathParam("dbid") String dbid) {
+    	Optional<BD_DTO> bddto = impl.getDatabases(userID, dbid);
+    	return bddto.get();
+    }
+    
 }

@@ -138,4 +138,11 @@ public class MongoUserDAO implements IUserDAO
 		return Optional.ofNullable(dbUserCollection.get().find(eq("id", id)).first());
 	}
 
+	@Override
+	public Optional<Userdb> getDatabases(String userID, String bdID) {
+		// TODO Auto-generated method stub
+		Optional<Userdb> userdb = getUserdbById(bdID);
+		return userdb;
+	}
+
 }
