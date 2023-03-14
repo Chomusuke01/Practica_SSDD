@@ -1,12 +1,13 @@
 package es.um.sisdist.models;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 
 public class BD_DTO {
 
 	private String dbname;
-	private HashMap<Object, Object> d;
+	
+	private ArrayList<KeyValueDTO> d;
 	
 	public String getDbname() {
 		return dbname;
@@ -15,13 +16,14 @@ public class BD_DTO {
 	public void setDbname(String dbname) {
 		this.dbname = dbname;
 	}
-	
-	public HashMap<Object, Object> getD() {
-		return new HashMap<>(d);
+
+	public ArrayList<KeyValueDTO> getD() {
+		return new ArrayList<>(d);
+	}
+
+	public void setD(ArrayList<KeyValueDTO> d) {
+		this.d = new ArrayList<>(d);
 	}
 	
-	public void setD(HashMap<Object, Object> d) {
-		this.d = new HashMap<>(d);
-	}
 	
 }

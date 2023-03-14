@@ -8,10 +8,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import es.um.sisdist.backend.dao.models.KeyValue;
 import es.um.sisdist.backend.dao.models.User;
+import es.um.sisdist.backend.dao.models.Userdb;
 import es.um.sisdist.backend.dao.utils.Lazy;
 
 /**
@@ -102,7 +105,13 @@ public class SQLUserDAO implements IUserDAO
 	}
 
 	@Override
-	public Optional<String> newBBDD(String userID, String bdID) {
+	public Optional<String> newBBDD(String userID, String bdID, ArrayList<KeyValue> kv) {
+		// TODO Auto-generated method stub
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<Userdb> getUserdbById(String id) {
 		// TODO Auto-generated method stub
 		return Optional.empty();
 	}

@@ -12,7 +12,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 import org.bson.codecs.pojo.Conventions;
 import static java.util.Arrays.*;
 
-
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -26,7 +26,9 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+import es.um.sisdist.backend.dao.models.KeyValue;
 import es.um.sisdist.backend.dao.models.User;
+import es.um.sisdist.backend.dao.models.Userdb;
 import es.um.sisdist.backend.dao.models.utils.UserUtils;
 import es.um.sisdist.backend.dao.utils.Lazy;
 
@@ -37,7 +39,9 @@ import es.um.sisdist.backend.dao.utils.Lazy;
 public class MongoUserDAO implements IUserDAO
 {
     private Supplier<MongoCollection<User>> collection;
-
+    
+    private Supplier<MongoCollection<Userdb>> dbUserCollection;
+    
     public MongoUserDAO()
     {
         CodecProvider pojoCodecProvider = PojoCodecProvider.builder().conventions(asList(Conventions.ANNOTATION_CONVENTION)).automatic(true).build();
@@ -57,6 +61,14 @@ public class MongoUserDAO implements IUserDAO
         	return database.getCollection("users", User.class);
         });
         //collection.get().dropIndexes(); /// PREGUNTAR, IMPORTANTE.
+        dbUserCollection = Lazy.lazily(() -> 
+        {
+        	MongoClient mongoClient = MongoClients.create(uri);
+        	MongoDatabase database = mongoClient
+        		.getDatabase(Optional.ofNullable(System.getenv("DB_NAME")).orElse("ssdd"))
+        		.withCodecRegistry(pojoCodecRegistry);
+        	return database.getCollection("keyvaluedb", Userdb.class);
+        });
     }
 
     @Override
@@ -93,21 +105,37 @@ public class MongoUserDAO implements IUserDAO
 		
 		collection.get().updateOne(eq("email", u.getEmail()), set("visits", u.getVisits() + 1));
 	}
+	
 
 	@Override
-	public Optional<String> newBBDD(String userID, String bdID) {
+	public Optional<String> newBBDD(String userID, String bdID, ArrayList<KeyValue> kv) {
 		
 		Optional<User> user = getUserById(userID);
+
 		
-		if (user.isEmpty()) {
+		/*if (user.isEmpty()) {
 			return Optional.empty();
 		}
 		
-		// TODO Comprobar que la bbdd tampoco existe ya y crearla
+		Optional<Userdb> dbuser = getUserdbById(bdID);
+		if (! dbuser.isEmpty()) {
+			return Optional.empty();
+		}*/		
 		
-		collection.get().updateOne(eq("uid", userID), push("bbdd", bdID));
+		collection.get().updateOne(eq("id", userID), push("bbdd", bdID));
+		
+		Userdb db = new Userdb(); 
+		db.setId(bdID);
+		db.setD(kv);
+		dbUserCollection.get().insertOne(db);
 		
 		return Optional.of(bdID);
+	}
+
+	@Override
+	public Optional<Userdb> getUserdbById(String id) {
+		
+		return Optional.ofNullable(dbUserCollection.get().find(eq("id", id)).first());
 	}
 
 }
