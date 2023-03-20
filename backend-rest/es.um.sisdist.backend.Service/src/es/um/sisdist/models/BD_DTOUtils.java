@@ -11,10 +11,7 @@ public class BD_DTOUtils {
 		ArrayList<KeyValueDTO> lista = bd.getD();
 		ArrayList<KeyValue> returnlist = new ArrayList<>();
 		for (KeyValueDTO keyvalue : lista) {
-            KeyValue kv = new KeyValue();
-            kv.setK(keyvalue.getK());
-            kv.setV(keyvalue.getV());
-
+            KeyValue kv = new KeyValue(keyvalue.getK(),keyvalue.getV());
             returnlist.add(kv);
         }
 		return returnlist;

@@ -1,13 +1,6 @@
 package es.um.sisdist.backend.dao.models;
 
-import org.bson.BsonDocument;
-import org.bson.BsonDouble;
-import org.bson.BsonInt32;
-import org.bson.BsonString;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.conversions.Bson;
-
-public class KeyValue implements Bson{
+public class KeyValue {
 
 	private Object k;
 	private Object v;
@@ -27,7 +20,13 @@ public class KeyValue implements Bson{
 	public void setV(Object v) {
 		this.v = v;
 	}
-
+	
+	
+	public KeyValue(Object k, Object v) {
+		this.k = k;
+		this.v = v;
+	}
+/*
 	@Override
     public <TDocument> BsonDocument toBsonDocument(Class<TDocument> documentClass, CodecRegistry codecRegistry) {
         BsonDocument doc = new BsonDocument();
@@ -38,8 +37,8 @@ public class KeyValue implements Bson{
 		} catch (NumberFormatException e) {
 			// TODO: handle exception
 			try {
-					float k = Float.parseFloat(this.getK().toString());
-					doc.put("k", new BsonDouble(k));
+				float k = Float.parseFloat(this.getK().toString());
+				doc.put("k", new BsonDouble(k));
 					
 			} catch (NumberFormatException e2) {
 				// TODO: handle exception
@@ -68,5 +67,5 @@ public class KeyValue implements Bson{
         
         return doc;
 	}
-	
+	*/
 }
