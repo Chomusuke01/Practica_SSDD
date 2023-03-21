@@ -26,46 +26,8 @@ public class KeyValue {
 		this.k = k;
 		this.v = v;
 	}
-/*
-	@Override
-    public <TDocument> BsonDocument toBsonDocument(Class<TDocument> documentClass, CodecRegistry codecRegistry) {
-        BsonDocument doc = new BsonDocument();
-        
-        try {
-        	int k = Integer.parseInt(this.getK().toString());
-        	doc.put("k", new BsonInt32(k));
-		} catch (NumberFormatException e) {
-			// TODO: handle exception
-			try {
-				float k = Float.parseFloat(this.getK().toString());
-				doc.put("k", new BsonDouble(k));
-					
-			} catch (NumberFormatException e2) {
-				// TODO: handle exception
-				String k = String.valueOf(this.getK());
-				doc.put("k", new BsonString(k));
-			}
+
+	public KeyValue() {
 		
-		}
-        
-        try {
-        	int v = Integer.parseInt(this.getV().toString());
-        	doc.put("v", new BsonInt32(v));
-		} catch (NumberFormatException e) {
-			// TODO: handle exception
-			try {
-					float v = Float.parseFloat(this.getV().toString());
-					doc.put("v", new BsonDouble(v));
-					
-			} catch (NumberFormatException e2) {
-				// TODO: handle exception
-				String v = String.valueOf(this.getV());
-				doc.put("v", new BsonString(v));
-			}
-		
-		}
-        
-        return doc;
 	}
-	*/
 }

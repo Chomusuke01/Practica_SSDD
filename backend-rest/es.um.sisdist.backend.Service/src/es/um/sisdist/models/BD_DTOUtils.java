@@ -28,6 +28,13 @@ public class BD_DTOUtils {
 		return lista;
 	}
 	
+	public static KeyValueDTO keyValueToDTO(KeyValue kv) {
+		KeyValueDTO dto = new KeyValueDTO();
+		dto.setK(kv.getK());
+		dto.setV(kv.getV());
+		
+		return dto;
+	}
 	
 	public static BD_DTO toBD_DTO(Userdb userdb) {
 		BD_DTO bddto = new BD_DTO();

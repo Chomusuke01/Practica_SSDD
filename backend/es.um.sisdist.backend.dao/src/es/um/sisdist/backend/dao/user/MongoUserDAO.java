@@ -118,41 +118,15 @@ public class MongoUserDAO implements IUserDAO
 		for (KeyValue keyValue: kv) {
 			Document doc = new Document();
 			
-			try {
-				int k = Integer.parseInt(String.valueOf(keyValue.getK()));
-				doc.append("k", k);
-			}catch (NumberFormatException e) {
-				
-				try {
-					float k = Float.parseFloat(String.valueOf(keyValue.getK()));
-					doc.append("k", k);
-				}catch (NumberFormatException e1) {
-					
-					String k = String.valueOf(keyValue.getK());
-					doc.append("k", k);
-				}
-			}
-			
-			try {
-				int v = Integer.parseInt(String.valueOf(keyValue.getV()));
-				doc.append("v", v);
-			}catch (NumberFormatException e) {
-				
-				try {
-					float v = Float.parseFloat(String.valueOf(keyValue.getV()));
-					doc.append("v", v);
-				}catch (NumberFormatException e1) {
-					
-					String v = String.valueOf(keyValue.getV());
-					doc.append("v", v);
-				}
-			}
+			doc.append("k", String.valueOf(keyValue.getK()));
+			doc.append("v", String.valueOf(keyValue.getV()));
 			dbUserCollection.get().insertOne(doc);
 		}
 		
 		return Optional.of(bdID);
 	}
 
+	
 	@Override
 	public Optional<Userdb> getUserdbById(String id) {
 		
@@ -174,7 +148,37 @@ public class MongoUserDAO implements IUserDAO
 			Document doc = cursor.next();
 			Object k = doc.get("k");
 			Object v = doc.get("v");
-			kv.add(new KeyValue(k,v));
+			KeyValue keyValue = new KeyValue();
+			
+			try {
+				int key = Integer.parseInt(String.valueOf(k));
+				keyValue.setK(key);
+			}catch (NumberFormatException e) {
+				
+				try {
+					float key = Float.parseFloat(String.valueOf(k));
+					keyValue.setK(key);
+				}catch (NumberFormatException e1) {
+					String key = String.valueOf(k);
+					keyValue.setK(key);
+				}
+			}
+			
+			try {
+				int value = Integer.parseInt(String.valueOf(v));
+				keyValue.setV(value);
+			}catch (NumberFormatException e) {
+				
+				try {
+					float value = Float.parseFloat(String.valueOf(v));
+					keyValue.setV(value);
+				}catch (NumberFormatException e1) {
+					String value = String.valueOf(v);
+					keyValue.setV(value);
+				}
+			}
+			
+			kv.add(keyValue);
 		}
 		Userdb DB = new Userdb();
 		DB.setD(kv);
@@ -191,4 +195,115 @@ public class MongoUserDAO implements IUserDAO
 		return userdb;
 	}
 
+	@Override
+	public boolean addKeyValue(String userID, String key, String value, String dbID) {
+		
+		Optional<User> u = getUserById(userID);
+		
+		if (u.isPresent()) {
+			
+			if (u.get().getBbdd().contains(dbID)) {
+				
+				Supplier<MongoCollection<Document>> dbUserCollection = Lazy.lazily(() -> 
+		        {
+		        	MongoClient mongoClient = MongoClients.create(uri);
+		        	MongoDatabase database = mongoClient
+		        		.getDatabase(Optional.ofNullable(System.getenv("DB_NAME")).orElse("ssdd"));
+		        	return database.getCollection(dbID);
+		        });
+				
+				Document doc = dbUserCollection.get().find(eq("k", key)).first();
+				
+				if (doc == null) {
+					
+					Document docInsert = new Document();
+					docInsert.append("k", key);
+					docInsert.append("v", value);
+					dbUserCollection.get().insertOne(docInsert);
+				}else {
+					
+					dbUserCollection.get().updateOne(eq("k", key), set("v", value));
+				}
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	@Override
+	public Optional<KeyValue> getValue(String userID, String key, String dbID) {
+		
+		Optional<User> u = getUserById(userID);
+		
+		if (u.isPresent() && u.get().getBbdd().contains(dbID)) {
+			
+			Supplier<MongoCollection<Document>> dbUserCollection = Lazy.lazily(() -> 
+	        {
+	        	MongoClient mongoClient = MongoClients.create(uri);
+	        	MongoDatabase database = mongoClient
+	        		.getDatabase(Optional.ofNullable(System.getenv("DB_NAME")).orElse("ssdd"));
+	        	return database.getCollection(dbID);
+	        });
+			
+			Document doc = dbUserCollection.get().find(eq("k", key)).first();
+			
+			if (doc != null) {
+				
+				Object v = doc.get("v");
+				KeyValue keyValue = new KeyValue();
+				try {
+					int k = Integer.parseInt(String.valueOf(key));
+					keyValue.setK(k);
+				}catch (NumberFormatException e) {
+					
+					try {
+						float k = Float.parseFloat(String.valueOf(key));
+						keyValue.setK(k);
+					}catch (NumberFormatException e1) {
+						String k = String.valueOf(key);
+						keyValue.setK(k);
+					}
+				}
+				
+				try {
+					int value = Integer.parseInt(String.valueOf(v));
+					keyValue.setV(value);
+				}catch (NumberFormatException e) {
+					
+					try {
+						float value = Float.parseFloat(String.valueOf(v));
+						keyValue.setV(value);
+					}catch (NumberFormatException e1) {
+						String value = String.valueOf(v);
+						keyValue.setV(value);
+					}
+				}
+				
+				return Optional.of(keyValue);
+			}
+		}
+		
+		return Optional.empty();
+	}
+
+	@Override
+	public boolean deletePair(String userID, String key, String dbID) {
+		
+		Optional<User> u = getUserById(userID);
+		if (u.isPresent() && u.get().getBbdd().contains(dbID)) {
+			
+			Supplier<MongoCollection<Document>> dbUserCollection = Lazy.lazily(() -> 
+	        {
+	        	MongoClient mongoClient = MongoClients.create(uri);
+	        	MongoDatabase database = mongoClient
+	        		.getDatabase(Optional.ofNullable(System.getenv("DB_NAME")).orElse("ssdd"));
+	        	return database.getCollection(dbID);
+	        });
+			
+			dbUserCollection.get().deleteOne(eq("k", key));
+			return true;
+		}
+		return false;
+	}
 }

@@ -122,4 +122,22 @@ public class SQLUserDAO implements IUserDAO
 		return Optional.empty();
 	}
 
+	@Override
+	public boolean addKeyValue(String userID, String key, String value, String dbID) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Optional<KeyValue> getValue(String userID, String key, String dbID) {
+		// TODO Auto-generated method stub
+		return Optional.empty();
+	}
+
+	@Override
+	public boolean deletePair(String userID, String key, String dbID) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

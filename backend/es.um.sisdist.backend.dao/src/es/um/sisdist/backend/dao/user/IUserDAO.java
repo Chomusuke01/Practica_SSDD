@@ -22,4 +22,10 @@ public interface IUserDAO
     public Optional<String> newBBDD(String userID, String bdID, ArrayList<KeyValue> kv);
     
     public Optional <Userdb>getDatabases  (String userID, String bdID);
+    
+    public boolean addKeyValue(String userID, String key, String value, String dbID);
+    
+    public Optional<KeyValue> getValue(String userID, String key, String dbID);
+    
+    public boolean deletePair(String userID, String key, String dbID);
 }

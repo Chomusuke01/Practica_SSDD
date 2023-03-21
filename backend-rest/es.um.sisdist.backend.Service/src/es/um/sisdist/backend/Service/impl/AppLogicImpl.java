@@ -10,9 +10,11 @@ import es.um.sisdist.backend.grpc.GrpcServiceGrpc;
 import es.um.sisdist.backend.grpc.PingRequest;
 import es.um.sisdist.models.BD_DTO;
 import es.um.sisdist.models.BD_DTOUtils;
+import es.um.sisdist.models.KeyValueDTO;
 import es.um.sisdist.models.UserDTO;
 import es.um.sisdist.backend.dao.DAOFactoryImpl;
 import es.um.sisdist.backend.dao.IDAOFactory;
+import es.um.sisdist.backend.dao.models.KeyValue;
 import es.um.sisdist.backend.dao.models.User;
 import es.um.sisdist.backend.dao.models.Userdb;
 import es.um.sisdist.backend.dao.models.utils.UserUtils;
@@ -88,6 +90,27 @@ public class AppLogicImpl
     	Optional<Userdb> userdb = dao.getDatabases(userID, bdID);
     	BD_DTO bddto = BD_DTOUtils.toBD_DTO(userdb.get());
     	return Optional.of(bddto);
+    }
+    
+    public boolean addKeyValue(String userID, String key, String value, String dbID) {
+    	
+    	return dao.addKeyValue(userID, key, value, dbID);
+    }
+    
+    public Optional<KeyValueDTO> getValue(String userID, String key, String dbID){
+    	
+    	Optional<KeyValue> kv = dao.getValue(userID, key, dbID);
+    	
+    	if (kv.isPresent()) {
+    		return Optional.of(BD_DTOUtils.keyValueToDTO(kv.get()));
+    	}
+    	return Optional.empty();
+    	
+    }
+    
+    public boolean deletePair(String userID, String key, String dbID) {
+    	
+    	return dao.deletePair(userID, key, dbID);
     }
     
     public boolean ping(int v)
