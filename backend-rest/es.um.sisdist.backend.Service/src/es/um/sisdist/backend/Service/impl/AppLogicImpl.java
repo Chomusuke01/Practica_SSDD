@@ -3,6 +3,7 @@
  */
 package es.um.sisdist.backend.Service.impl;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -11,6 +12,8 @@ import es.um.sisdist.backend.grpc.PingRequest;
 import es.um.sisdist.models.BD_DTO;
 import es.um.sisdist.models.BD_DTOUtils;
 import es.um.sisdist.models.KeyValueDTO;
+import es.um.sisdist.models.Query_DTO;
+import es.um.sisdist.models.Query_DTOUtils;
 import es.um.sisdist.models.UserDTO;
 import es.um.sisdist.backend.dao.DAOFactoryImpl;
 import es.um.sisdist.backend.dao.IDAOFactory;
@@ -142,5 +145,10 @@ public class AppLogicImpl
         }
 
         return Optional.empty();
+    }
+    public Optional<Query_DTO> makeQuery(String userID, String pattern, String dbID, int page, int perpage){
+    	Optional<ArrayList<KeyValue>> values = dao.makeQuery(userID, pattern, dbID, page, perpage);
+    	if (values.isPresent()) return Optional.of(Query_DTOUtils.toDTO(dbID, pattern, page, perpage, values.get()));
+    	return Optional.empty();
     }
 }

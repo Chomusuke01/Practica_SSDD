@@ -5,6 +5,7 @@ package es.um.sisdist.backend.dao.user;
 
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.regex;
 import static com.mongodb.client.model.Updates.set;
 import static com.mongodb.client.model.Updates.push;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
@@ -305,5 +306,63 @@ public class MongoUserDAO implements IUserDAO
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public Optional<ArrayList<KeyValue>> makeQuery(String userID, String pattern, String dbID, int page, int perpage) {
+		// TODO Auto-generated method stub
+		Optional<User> u = getUserById(userID);
+		if (u.isPresent() && u.get().getBbdd().contains(dbID)) {
+			Supplier<MongoCollection<Document>> dbUserCollection = Lazy.lazily(() -> 
+	        {
+	        	MongoClient mongoClient = MongoClients.create(uri);
+	        	MongoDatabase database = mongoClient
+	        		.getDatabase(Optional.ofNullable(System.getenv("DB_NAME")).orElse("ssdd"));
+	        	return database.getCollection(dbID);
+	        });
+			ArrayList<Document> sampleDataList = dbUserCollection.get().find(regex("k", pattern, "i"))
+		            .skip( page > 0 ? ( ( page - 1 ) * perpage ) : 0 )
+		            .limit(perpage)
+		            .into(new ArrayList<>());
+			ArrayList<KeyValue> returnList = new ArrayList<KeyValue>();
+			
+			for (Document doc : sampleDataList) {
+				
+				Object k = doc.get("k");
+				Object v = doc.get("v");
+				KeyValue keyValue = new KeyValue();
+				
+				try {
+					int key = Integer.parseInt(String.valueOf(k));
+					keyValue.setK(key);
+				}catch (NumberFormatException e) {
+					
+					try {
+						float key = Float.parseFloat(String.valueOf(k));
+						keyValue.setK(key);
+					}catch (NumberFormatException e1) {
+						String key = String.valueOf(k);
+						keyValue.setK(key);
+					}
+				}
+				
+				try {
+					int value = Integer.parseInt(String.valueOf(v));
+					keyValue.setV(value);
+				}catch (NumberFormatException e) {
+					
+					try {
+						float value = Float.parseFloat(String.valueOf(v));
+						keyValue.setV(value);
+					}catch (NumberFormatException e1) {
+						String value = String.valueOf(v);
+						keyValue.setV(value);
+					}
+				}
+				returnList.add(keyValue);
+			}
+			return Optional.of(returnList);
+		}
+		return Optional.empty();
 	}
 }

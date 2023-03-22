@@ -140,4 +140,10 @@ public class SQLUserDAO implements IUserDAO
 		return false;
 	}
 
+	@Override
+	public Optional<ArrayList<KeyValue>> makeQuery(String userID, String pattern, String dbID, int page, int perpage) {
+		// TODO Auto-generated method stub
+		return Optional.empty();
+	}
+
 }

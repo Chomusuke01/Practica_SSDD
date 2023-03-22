@@ -28,4 +28,6 @@ public interface IUserDAO
     public Optional<KeyValue> getValue(String userID, String key, String dbID);
     
     public boolean deletePair(String userID, String key, String dbID);
+    
+    public Optional<ArrayList<KeyValue>> makeQuery(String userID, String pattern, String dbID, int page, int perpage);
 }

@@ -112,4 +112,11 @@ public class UsersEndpoint
     	
     	return Response.status(Status.METHOD_NOT_ALLOWED).build();
     }
+    
+    @GET
+    @Path("/{id}/db/{dbid}/q")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response query(@QueryParam("pattern") String pattern, @QueryParam("page") int page, @QueryParam("perpage") int perpage) {
+    	return null;
+    }
 }
