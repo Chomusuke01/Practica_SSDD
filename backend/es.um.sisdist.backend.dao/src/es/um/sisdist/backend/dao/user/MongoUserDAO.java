@@ -16,18 +16,21 @@ import static java.util.Arrays.*;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 
 import es.um.sisdist.backend.dao.models.KeyValue;
 import es.um.sisdist.backend.dao.models.User;
@@ -310,7 +313,7 @@ public class MongoUserDAO implements IUserDAO
 
 	@Override
 	public Optional<ArrayList<KeyValue>> makeQuery(String userID, String pattern, String dbID, int page, int perpage) {
-		// TODO Auto-generated method stub
+	
 		Optional<User> u = getUserById(userID);
 		if (u.isPresent() && u.get().getBbdd().contains(dbID)) {
 			Supplier<MongoCollection<Document>> dbUserCollection = Lazy.lazily(() -> 
@@ -320,10 +323,12 @@ public class MongoUserDAO implements IUserDAO
 	        		.getDatabase(Optional.ofNullable(System.getenv("DB_NAME")).orElse("ssdd"));
 	        	return database.getCollection(dbID);
 	        });
-			ArrayList<Document> sampleDataList = dbUserCollection.get().find(regex("k", pattern, "i"))
+					
+			ArrayList<Document> sampleDataList = dbUserCollection.get().find(regex("k", pattern))
 		            .skip( page > 0 ? ( ( page - 1 ) * perpage ) : 0 )
 		            .limit(perpage)
 		            .into(new ArrayList<>());
+			
 			ArrayList<KeyValue> returnList = new ArrayList<KeyValue>();
 			
 			for (Document doc : sampleDataList) {

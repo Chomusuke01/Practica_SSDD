@@ -6,10 +6,12 @@ import es.um.sisdist.backend.Service.impl.AppLogicImpl;
 import es.um.sisdist.backend.dao.models.User;
 import es.um.sisdist.models.BD_DTO;
 import es.um.sisdist.models.KeyValueDTO;
+import es.um.sisdist.models.Query_DTO;
 import es.um.sisdist.models.UserDTO;
 import es.um.sisdist.models.UserDTOUtils;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -116,7 +118,14 @@ public class UsersEndpoint
     @GET
     @Path("/{id}/db/{dbid}/q")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response query(@QueryParam("pattern") String pattern, @QueryParam("page") int page, @QueryParam("perpage") int perpage) {
-    	return null;
+    public Response query(@PathParam("id") String userID, @PathParam("dbid") String dbID, @QueryParam("pattern") String pattern, @QueryParam("page") int page, @DefaultValue("50") @QueryParam("perpage") int perpage) {
+    	
+    	Optional<Query_DTO> dto = impl.makeQuery(userID, pattern, dbID, page, perpage);
+    	
+    	if (dto.isPresent()) {
+    		return Response.ok(dto.get()).build();
+    	}
+    	return Response.status(Status.METHOD_NOT_ALLOWED).build();
+    		
     }
 }
