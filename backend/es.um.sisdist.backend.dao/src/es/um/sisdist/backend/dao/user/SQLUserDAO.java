@@ -146,4 +146,10 @@ public class SQLUserDAO implements IUserDAO
 		return Optional.empty();
 	}
 
+	@Override
+	public Optional<ArrayList<String>> getUserDatabases(String userID) {
+		// TODO Auto-generated method stub
+		return Optional.empty();
+	}
+
 }

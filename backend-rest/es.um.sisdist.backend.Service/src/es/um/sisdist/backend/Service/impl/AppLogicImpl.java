@@ -116,6 +116,10 @@ public class AppLogicImpl
     	return dao.deletePair(userID, key, dbID);
     }
     
+    public Optional<ArrayList<String>> getUserDatabases(String userID){
+    	return dao.getUserDatabases(userID);
+    }
+    
     public boolean ping(int v)
     {
     	logger.info("Issuing ping, value: " + v);

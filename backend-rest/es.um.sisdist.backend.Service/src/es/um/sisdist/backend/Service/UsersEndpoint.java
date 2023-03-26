@@ -1,5 +1,6 @@
 package es.um.sisdist.backend.Service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import es.um.sisdist.backend.Service.impl.AppLogicImpl;
@@ -73,6 +74,19 @@ public class UsersEndpoint
     public BD_DTO getDatabases(@PathParam("id") String userID, @PathParam("dbid") String dbid) {
     	Optional<BD_DTO> bddto = impl.getDatabases(userID, dbid);
     	return bddto.get();
+    }
+    
+    @GET
+    @Path("/{id}/db")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserDatabases(@PathParam("id") String userID) {
+    	
+    	Optional<ArrayList<String>> databases = impl.getUserDatabases(userID);
+    	
+    	if (databases.isPresent()) {
+    		return Response.ok(databases.get()).build();
+    	}
+    	return Response.status(Status.NOT_FOUND).build();
     }
     
     @PUT

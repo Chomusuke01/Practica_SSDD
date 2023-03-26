@@ -30,4 +30,6 @@ public interface IUserDAO
     public boolean deletePair(String userID, String key, String dbID);
     
     public Optional<ArrayList<KeyValue>> makeQuery(String userID, String pattern, String dbID, int page, int perpage);
+    
+    public Optional<ArrayList<String>> getUserDatabases(String userID);
 }

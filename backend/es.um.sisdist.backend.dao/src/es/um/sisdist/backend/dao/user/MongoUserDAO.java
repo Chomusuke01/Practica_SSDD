@@ -370,4 +370,15 @@ public class MongoUserDAO implements IUserDAO
 		}
 		return Optional.empty();
 	}
+
+	@Override
+	public Optional<ArrayList<String>> getUserDatabases(String userID) {
+		
+		Optional<User> user = getUserById(userID);
+		
+		if (user.isPresent())
+			return Optional.of(user.get().getBbdd());
+		
+		return Optional.empty();
+	}
 }
