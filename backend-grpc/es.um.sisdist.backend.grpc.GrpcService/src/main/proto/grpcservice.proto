@@ -7,15 +7,24 @@ package es.um.sisdist.backend.grpc;
 
 service GrpcService
 {
-    rpc Ping(PingRequest) returns (PingResponse);
+    rpc mapReduce(MapReduceRequest) returns (KeyValueDB);
 }
 
-message PingRequest
+message MapReduceRequest
 {
-	int32 v = 1;
+	string map = 1;
+	string reduce = 2;
+	repeated KeyValue kv = 3;
+}
+message KeyValueDB
+{
+	repeated KeyValue kv = 1;
 }
 
-message PingResponse
+message KeyValue
 {
-	int32 v = 1;
+	string k = 1;
+	string v = 2;
+	
 }
+

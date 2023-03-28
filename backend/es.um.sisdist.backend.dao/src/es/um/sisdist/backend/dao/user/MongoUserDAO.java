@@ -381,4 +381,32 @@ public class MongoUserDAO implements IUserDAO
 		
 		return Optional.empty();
 	}
+
+	@Override
+	public Optional<Userdb> getUserDBByIDRAW(String userID, String dbID) {
+		// TODO Auto-generated method stub
+		Optional<User> user = getUserById(userID);
+		if (user.isPresent() && user.get().getBbdd().contains(dbID))
+		{
+			Supplier<MongoCollection<Document>> dbUserCollection = Lazy.lazily(() -> 
+	        {
+	        	MongoClient mongoClient = MongoClients.create(uri);
+	        	MongoDatabase database = mongoClient
+	        		.getDatabase(Optional.ofNullable(System.getenv("DB_NAME")).orElse("ssdd"));
+	        	return database.getCollection(dbID);
+	        });
+			ArrayList<KeyValue> kv = new ArrayList<>();
+			FindIterable<Document> docs = dbUserCollection.get().find();
+
+	        MongoCursor<Document> cursor = docs.iterator();
+	        while (cursor.hasNext()) {
+	        	Document doc = cursor.next();
+	        	KeyValue keyvalue = new KeyValue();
+	        	keyvalue.setK(doc.get("k"));
+	        	keyvalue.setV(doc.get("v"));
+	        	kv.add(keyvalue);
+	        }
+		}
+		return Optional.empty();
+	}
 }

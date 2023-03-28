@@ -152,4 +152,10 @@ public class SQLUserDAO implements IUserDAO
 		return Optional.empty();
 	}
 
+	@Override
+	public Optional<Userdb> getUserDBByIDRAW(String userID, String dbID) {
+		// TODO Auto-generated method stub
+		return Optional.empty();
+	}
+
 }
