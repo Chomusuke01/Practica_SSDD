@@ -42,16 +42,6 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Inicio</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Enlace 1</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Otro enlace</a>
-          </li>
-
           {% if current_user.is_authenticated %}
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for("profile") }}">Profile</a>
@@ -62,6 +52,12 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for("bbdd") }}">Data Bases</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for("newDatabase") }}">New Database</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for("showDatabase") }}">Show Database</a>
           </li>
           {% else %}
           <li class="nav-item">

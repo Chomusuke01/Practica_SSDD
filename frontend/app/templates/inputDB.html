@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!doctype html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Contenido de la base de datos</h1>
+    <form method="post" action="{{ url_for('newDatabase') }}">
+      <input type="text" name="newDatabaseName"  placeholder="New data base name">
+      <textarea name="databaseContent" rows="20" cols="50"></textarea>
+      <br>
+      <input type="submit" value="Enviar">
+    </form>
+  </body>
+</html>
+{% endblock %}

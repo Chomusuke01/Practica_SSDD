@@ -14,3 +14,6 @@ class RegisterForm(FlaskForm):
     name = StringField('name', validators=[DataRequired()])
     confirm_password = PasswordField('confirm_password', validators=[InputRequired(), EqualTo('password', message='Passwords must match')])
     
+class NewDatabaseForm(FlaskForm):
+    databaseName = StringField('newDatabaseName', validators=[InputRequired()])
+    databaseContent = StringField('databaseContent', validators=[InputRequired()])

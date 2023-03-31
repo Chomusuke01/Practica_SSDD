@@ -1,12 +1,12 @@
 from flask import Flask, render_template, send_from_directory, url_for, request, redirect
 from flask_login import LoginManager, login_manager, current_user, login_user, login_required, logout_user
-import requests
+import requests, json
 
 # Usuarios
 from models import users, User
 
 # Login
-from forms import LoginForm, RegisterForm
+from forms import LoginForm, RegisterForm, NewDatabaseForm
 
 app = Flask(__name__, static_url_path='')
 login_manager = LoginManager()
@@ -90,6 +90,63 @@ def bbdd():
         listaBBDD = eval(response.content.decode('utf-8'))
         return render_template('bbdd.html', bdList=listaBBDD, len=len(listaBBDD))
     
+
+@app.route('/newDatabase', methods=['POST', 'GET'])
+@login_required
+def newDatabase():
+
+    form = NewDatabaseForm(None if request.method != 'POST' else request.form)
+    if request.method == "POST":
+        
+        dbData = request.form['databaseContent']
+        dbName = request.form['newDatabaseName']
+
+        data = {
+            "dbname": dbName,
+            "d": json.loads(dbData)
+        }
+
+        response = requests.post("http://{}/Service/u/{}/db".format(backendURL, current_user.id), json=data)
+
+        if response.status_code == 201:
+            return redirect(url_for('bbdd'))
+
+    return render_template('inputDB.html', form=form)
+
+@app.route('/showDatabase', methods=['POST', 'GET'])
+@login_required
+def showDatabase():
+
+    if request.method == "POST":
+
+        response = requests.get("http://{}/Service/u/{}/db/{}".format(backendURL, current_user.id, request.form['DatabaseName']))
+
+        if response.status_code == 200:
+
+            content = response.json()
+
+            return render_template('showDatabase.html', dbName=content['dbname'], databaseContent=content['d'])
+    
+    return render_template('showDatabase.html', dbName=None)
+
+
+##TODO
+@app.route('/addKey', methods=['POST', 'GET'])
+@login_required
+def addKey():
+
+    if request.method == "POST":
+
+        response = requests.put("http://{}/Service/u/{}/db/{}/d/{}?v={}".format(backendURL, 
+        current_user.id, request.form['dbName'], request.form['key'], request.form['value']))
+
+        if response.status_code == 200:
+
+            content = response.json()
+
+            return render_template('showDatabase.html', dbName=content['dbname'], databaseContent=content['d'])
+    
+    return render_template('showDatabase.html', dbName=None)
 
 @app.route('/postbd', methods=['POST'])
 @login_required 
