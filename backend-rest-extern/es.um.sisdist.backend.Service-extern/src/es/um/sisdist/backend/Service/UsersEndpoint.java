@@ -21,4 +21,11 @@ public class UsersEndpoint
     {
         return UserDTOUtils.toDTO(impl.getUserByEmail(username).orElse(null));
     }
+    
+    @GET
+    @Path("/hola")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hola() {
+    	return "Hola";
+    }
 }

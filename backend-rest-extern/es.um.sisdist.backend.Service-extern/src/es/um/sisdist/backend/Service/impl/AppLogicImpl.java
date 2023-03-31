@@ -7,7 +7,8 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import es.um.sisdist.backend.grpc.GrpcServiceGrpc;
-import es.um.sisdist.backend.grpc.PingRequest;
+import es.um.sisdist.backend.grpc.MapReduceRequest;
+import es.um.sisdist.backend.grpc.MapReduceResponse;
 import es.um.sisdist.backend.dao.DAOFactoryImpl;
 import es.um.sisdist.backend.dao.IDAOFactory;
 import es.um.sisdist.backend.dao.models.User;
@@ -15,6 +16,7 @@ import es.um.sisdist.backend.dao.models.utils.UserUtils;
 import es.um.sisdist.backend.dao.user.IUserDAO;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.stub.StreamObserver;
 
 /**
  * @author dsevilla
@@ -71,18 +73,29 @@ public class AppLogicImpl
         return dao.getUserById(userId);
     }
 
-    public boolean ping(int v)
-    {
-    	logger.info("Issuing ping, value: " + v);
+    public void mapReduce(String userID, String out_db, String map, String reduce, String in_db) {
     	
-        // Test de grpc, puede hacerse con la BD
-    	var msg = PingRequest.newBuilder().setV(v).build();
-        var response = blockingStub.ping(msg);
-        
-        return response.getV() == v;
-    }
-    public void mapReduce(String userID, String dbID) {
+    	dao.addMrQueue(out_db);
     	
+    	var mapReduceRequest = MapReduceRequest.newBuilder().setInDb(in_db).setMap(map).setReduce(reduce).setOutDb(out_db).setUserID(userID).build();
+    	 
+    	asyncStub.mapReduce(mapReduceRequest, new StreamObserver<MapReduceResponse>() {
+			
+			@Override
+			public void onNext(MapReduceResponse value) {
+				dao.removeMrQueue(out_db);
+			}
+			
+			@Override
+			public void onError(Throwable t) {
+				logger.warning("Fallo al llamar al método remoto");
+			}
+			
+			@Override
+			public void onCompleted() {
+			
+			}
+		});
     }
 
     // El frontend, a través del formulario de login,

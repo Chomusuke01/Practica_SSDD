@@ -34,4 +34,8 @@ public interface IUserDAO
     public Optional<ArrayList<String>> getUserDatabases(String userID);
     
     public Optional<Userdb> getUserDBByIDRAW(String userID, String dbID);
+    
+    public void addMrQueue(String dbID);
+    
+    public void removeMrQueue(String dbID);
 }

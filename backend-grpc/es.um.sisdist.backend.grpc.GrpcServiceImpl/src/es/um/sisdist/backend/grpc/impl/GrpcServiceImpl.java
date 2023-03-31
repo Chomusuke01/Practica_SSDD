@@ -1,12 +1,17 @@
 package es.um.sisdist.backend.grpc.impl;
 
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Logger;
+
+import es.um.sisdist.backend.dao.IDAOFactory;
+import es.um.sisdist.backend.dao.models.KeyValue;
+import es.um.sisdist.backend.dao.models.Userdb;
+import es.um.sisdist.backend.dao.user.IUserDAO;
 import es.um.sisdist.backend.grpc.GrpcServiceGrpc;
-import es.um.sisdist.backend.grpc.KeyValue;
-import es.um.sisdist.backend.grpc.KeyValueDB;
-import es.um.sisdist.backend.grpc.KeyValueDB.Builder;
 import es.um.sisdist.backend.grpc.MapReduceRequest;
+import es.um.sisdist.backend.grpc.MapReduceResponse;
 import es.um.sisdist.backend.grpc.impl.jscheme.JSchemeProvider;
 import es.um.sisdist.backend.grpc.impl.jscheme.MapReduceApply;
 import io.grpc.stub.StreamObserver;
@@ -14,46 +19,41 @@ import io.grpc.stub.StreamObserver;
 class GrpcServiceImpl extends GrpcServiceGrpc.GrpcServiceImplBase 
 {
 	private Logger logger;
+	IUserDAO dao;
+	IDAOFactory daoFactory;
 	
-    public GrpcServiceImpl(Logger logger) 
+    public GrpcServiceImpl(Logger logger, IUserDAO dao) 
     {
 		super();
 		this.logger = logger;
+		this.dao = dao;
 	}
 
     @Override
-	public void mapReduce(MapReduceRequest request, StreamObserver<KeyValueDB> responseObserver)
+	public void mapReduce(MapReduceRequest request, StreamObserver<MapReduceResponse> responseObserver)
     {
+    	logger.info("Se ha recibido una nueva petición map-reduce");
+    	
 		MapReduceApply mapReduceApply = new MapReduceApply(JSchemeProvider.js(), request.getMap(), request.getReduce());
-		for (KeyValue kv : request.getKvList()) {
-			Object k;
-			Object v;
-			try {
-				k = Integer.parseInt(kv.getK());				
-			}catch (NumberFormatException e) {				
-				try {
-					k = Float.parseFloat(kv.getK());
-				}catch (NumberFormatException e1) {
-					k = kv.getK();
-				}
-			}
-			try {
-				v = Integer.parseInt(kv.getV());				
-			}catch (NumberFormatException e) {				
-				try {
-					v = Float.parseFloat(kv.getV());
-				}catch (NumberFormatException e1) {
-					v = kv.getV();
-				}
-			}
-			mapReduceApply.apply(k, v);
+		
+		Optional<Userdb> userdb = dao.getUserdbById(request.getInDb());
+		
+		for (KeyValue kv : userdb.get().getD()) {
+			mapReduceApply.apply(kv.getK(), kv.getV());
 		}
-		Map<Object,Object> map = mapReduceApply.map_reduce();
-		Builder builder = KeyValueDB.newBuilder();
-		for (Object k : map.keySet()) {
-			builder.addKv(KeyValue.newBuilder().setK(String.valueOf(k)).setV(String.valueOf(map.get(k))).build());			
+		
+		Map<Object,Object> result = mapReduceApply.map_reduce();
+		
+		ArrayList<KeyValue> db_out = new ArrayList<>();
+		
+		for (Object k: result.keySet()) {
+			
+			db_out.add(new KeyValue(k, result.get(k)));
 		}
-		responseObserver.onNext(builder.build());
+		
+		dao.newBBDD(request.getUserID(), request.getOutDb(), db_out);
+		
+		responseObserver.onNext(MapReduceResponse.newBuilder().setMrID(request.getOutDb()).build());
 		responseObserver.onCompleted();
 	}
 }

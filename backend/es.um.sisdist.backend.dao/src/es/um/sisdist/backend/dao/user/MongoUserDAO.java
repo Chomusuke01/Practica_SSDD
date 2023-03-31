@@ -16,21 +16,18 @@ import static java.util.Arrays.*;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
 
 import es.um.sisdist.backend.dao.models.KeyValue;
 import es.um.sisdist.backend.dao.models.User;
@@ -47,6 +44,8 @@ import es.um.sisdist.backend.dao.utils.Lazy;
 public class MongoUserDAO implements IUserDAO
 {
     private Supplier<MongoCollection<User>> collection;
+    private Supplier<MongoCollection<Document>> mrQueue;
+    
     private String uri = "mongodb://root:root@" 
     		+ Optional.ofNullable(System.getenv("MONGO_SERVER")).orElse("localhost")
             + ":27017/ssdd?authSource=admin";
@@ -67,7 +66,15 @@ public class MongoUserDAO implements IUserDAO
         		.withCodecRegistry(pojoCodecRegistry);
         	return database.getCollection("users", User.class);
         });
-       
+        
+        mrQueue = Lazy.lazily(() -> 
+        {
+        	MongoClient mongoClient = MongoClients.create(uri);
+        	MongoDatabase database = mongoClient
+        		.getDatabase(Optional.ofNullable(System.getenv("DB_NAME")).orElse("ssdd"))
+        		.withCodecRegistry(pojoCodecRegistry);
+        	return database.getCollection("mrQueue");
+        });
     }
 
     @Override
@@ -408,5 +415,20 @@ public class MongoUserDAO implements IUserDAO
 	        }
 		}
 		return Optional.empty();
+	}
+
+	@Override
+	public void addMrQueue(String dbID) {
+		
+		Document doc = new Document();
+		doc.append("dbID", dbID);
+		doc.append("status", 0);
+		mrQueue.get().insertOne(doc);
+	}
+
+	@Override
+	public void removeMrQueue(String dbID) {
+		
+		mrQueue.get().updateOne(eq("dbID", dbID), set("status", 1));
 	}
 }

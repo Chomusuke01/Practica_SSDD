@@ -27,8 +27,8 @@ services:
       - 8080:8080
     env_file: mongo.env
 
-  backend-rest:
-    build: backend-rest/es.um.sisdist.backend.Service-extern/.
+  backend-rest-extern:
+    build: backend-rest-extern/es.um.sisdist.backend.Service-extern/.
     ports:
       - 8180:8180
     env_file: mongo.env

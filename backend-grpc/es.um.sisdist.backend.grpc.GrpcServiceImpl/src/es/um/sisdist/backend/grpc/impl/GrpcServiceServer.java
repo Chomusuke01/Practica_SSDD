@@ -38,6 +38,10 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import es.um.sisdist.backend.dao.DAOFactoryImpl;
+import es.um.sisdist.backend.dao.IDAOFactory;
+import es.um.sisdist.backend.dao.user.IUserDAO;
+
 /**
  * Server that manages startup/shutdown of a {@code Greeter} server.
  */
@@ -53,9 +57,20 @@ public class GrpcServiceServer
   {
 	Optional<String> grpcServerPort = 
 			Optional.ofNullable(System.getenv("GRPC_SERVER_PORT"));
+	
+	IDAOFactory daoFactory = new DAOFactoryImpl();
+	IUserDAO dao;
+	
+    Optional<String> backend = Optional.ofNullable(System.getenv("DB_BACKEND"));
+    
+    if (backend.isPresent() && backend.get().equals("mongo"))
+        dao = daoFactory.createMongoUserDAO();
+    else
+        dao = daoFactory.createSQLUserDAO();
+    
     server = ServerBuilder.forPort(
     			grpcServerPort.isPresent() ? Integer.parseInt(grpcServerPort.get()) : port)
-        .addService(new GrpcServiceImpl(logger))
+        .addService(new GrpcServiceImpl(logger,dao))
         .build()
         .start();
     logger.info("Server started, listening on " + port);

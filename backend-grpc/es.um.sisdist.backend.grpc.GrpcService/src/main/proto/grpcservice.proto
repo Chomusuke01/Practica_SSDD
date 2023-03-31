@@ -7,24 +7,20 @@ package es.um.sisdist.backend.grpc;
 
 service GrpcService
 {
-    rpc mapReduce(MapReduceRequest) returns (KeyValueDB);
+    rpc mapReduce(MapReduceRequest) returns (MapReduceResponse);
 }
 
 message MapReduceRequest
 {
 	string map = 1;
 	string reduce = 2;
-	repeated KeyValue kv = 3;
-}
-message KeyValueDB
-{
-	repeated KeyValue kv = 1;
+	string in_db = 3;
+	string out_db = 4;
+	string userID = 5;
 }
 
-message KeyValue
+message MapReduceResponse
 {
-	string k = 1;
-	string v = 2;
-	
+	string mrID = 1;
 }
 

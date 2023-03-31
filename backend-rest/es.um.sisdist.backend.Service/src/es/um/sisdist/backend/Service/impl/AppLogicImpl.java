@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import es.um.sisdist.backend.grpc.GrpcServiceGrpc;
-import es.um.sisdist.backend.grpc.PingRequest;
+
 import es.um.sisdist.models.BD_DTO;
 import es.um.sisdist.models.BD_DTOUtils;
 import es.um.sisdist.models.KeyValueDTO;
@@ -120,17 +120,6 @@ public class AppLogicImpl
     	return dao.getUserDatabases(userID);
     }
     
-    public boolean ping(int v)
-    {
-    	logger.info("Issuing ping, value: " + v);
-    	
-        // Test de grpc, puede hacerse con la BD
-    	var msg = PingRequest.newBuilder().setV(v).build();
-        var response = blockingStub.ping(msg);
-        
-        return response.getV() == v;
-    }
-
     // El frontend, a través del formulario de login,
     // envía el usuario y pass, que se convierte a un DTO. De ahí
     // obtenemos la consulta a la base de datos, que nos retornará,

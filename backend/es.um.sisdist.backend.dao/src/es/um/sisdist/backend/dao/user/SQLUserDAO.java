@@ -158,4 +158,16 @@ public class SQLUserDAO implements IUserDAO
 		return Optional.empty();
 	}
 
+	@Override
+	public void addMrQueue(String dbID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void removeMrQueue(String dbID) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
