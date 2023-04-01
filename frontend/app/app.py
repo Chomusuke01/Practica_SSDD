@@ -130,7 +130,6 @@ def showDatabase():
     return render_template('showDatabase.html', dbName=None)
 
 
-##TODO
 @app.route('/addKey', methods=['POST', 'GET'])
 @login_required
 def addKey():
@@ -142,11 +141,66 @@ def addKey():
 
         if response.status_code == 200:
 
-            content = response.json()
-
-            return render_template('showDatabase.html', dbName=content['dbname'], databaseContent=content['d'])
+            return render_template('addkeyValue.html', result="Clave añadida con éxito")
+        
+        return render_template('addkeyValue.html', result="Fallo al añadir la clave")
     
-    return render_template('showDatabase.html', dbName=None)
+    return render_template('addkeyValue.html', result=None)
+
+@app.route('/getValue', methods=['POST', 'GET'])
+@login_required
+def getValue():
+
+    if request.method == "POST":
+
+        response = requests.get("http://{}/Service/u/{}/db/{}/d/{}".format(backendURL, 
+        current_user.id, request.form['dbName'], request.form['key']))
+
+        if response.status_code == 200:
+
+            responseData = response.json()
+            return render_template('showKeyValue.html', result=responseData)
+
+        return render_template('showKeyValue.html', result="Fallo al encontrar la clave")
+
+    return render_template('showKeyValue.html', result=None)
+
+
+@app.route('/deleteKey', methods=['POST', 'GET'])
+@login_required
+def deleteKey():
+
+    if request.method == "POST":
+        
+        response = requests.delete("http://{}/Service/u/{}/db/{}/d/{}".format(backendURL, 
+        current_user.id, request.form['dbName'], request.form['key']))
+
+        if response.status_code == 200:
+            
+            return render_template('deleteKey.html', result="Clave eliminada con éxito")
+
+        return render_template('deleteKey.html', result="Fallo al borrar la clave")
+
+    return render_template('deleteKey.html', result=None)
+
+
+@app.route('/makeQuery', methods=['POST', 'GET'])
+@login_required
+def makeQuery():
+    
+    if request.method == "POST":
+
+        response = requests.get("http://{}/Service/u/{}/db/{}/q?pattern={}&page={}&perpage={}".format(backendURL,
+        current_user.id, request.form['db'], request.form['pattern'], request.form['page'], request.form['perpage']))
+
+        if response.status_code == 200:
+
+            return render_template('query.html', result=json.dumps(response.json()['d'], indent=2))
+
+        return render_template('query.html', result="Error al procesar la petición")
+
+    return render_template('query.html', result=None)
+
 
 @app.route('/postbd', methods=['POST'])
 @login_required 

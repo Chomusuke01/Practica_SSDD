@@ -59,6 +59,18 @@
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for("showDatabase") }}">Show Database</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for("addKey") }}">Add key</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for("getValue") }}">Get value</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for("deleteKey") }}">Delete key</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for("makeQuery") }}">Query</a>
+          </li>
           {% else %}
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for("login") }}">Login!</a>

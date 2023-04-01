@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!doctype html>
+<html>
+  <body>
+    {% if not result %}
+      <form method="post" action="{{ url_for('makeQuery') }}">
+        <div class="field">
+            <div class="control">
+                <input class="input is-large" name="db" placeholder="Database" >
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <input class="input is-large" name="pattern" placeholder="Pattern" >
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <input class="input is-large" name="page" placeholder="Page" >
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <input class="input is-large" name="perpage" placeholder="Perpage" >
+            </div>
+        </div>
+
+        <input type="submit" value="Enviar">
+      </form>
+      {% else %}
+      <h2>Resultado</h2>
+      <textarea name="databaseContent" rows="20" cols="50" readonly>{{ result }}</textarea>
+      {% endif %}
+  </body>
+</html>
+{% endblock %}
