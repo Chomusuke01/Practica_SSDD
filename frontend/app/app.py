@@ -1,6 +1,7 @@
 from flask import Flask, render_template, send_from_directory, url_for, request, redirect
 from flask_login import LoginManager, login_manager, current_user, login_user, login_required, logout_user
 import requests, json
+import urllib.parse as encoder
 
 # Usuarios
 from models import users, User
@@ -191,7 +192,7 @@ def makeQuery():
     if request.method == "POST":
 
         response = requests.get("http://{}/Service/u/{}/db/{}/q?pattern={}&page={}&perpage={}".format(backendURL,
-        current_user.id, request.form['db'], request.form['pattern'], request.form['page'], request.form['perpage']))
+        current_user.id, request.form['db'], encoder.quote(request.form['pattern']), request.form['page'], request.form['perpage']))
 
         if response.status_code == 200:
 

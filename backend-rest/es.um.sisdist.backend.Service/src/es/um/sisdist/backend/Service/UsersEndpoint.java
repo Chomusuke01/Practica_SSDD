@@ -25,6 +25,9 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.Response.Status;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 
 @Path("/u")
 public class UsersEndpoint
@@ -134,7 +137,17 @@ public class UsersEndpoint
     @Produces(MediaType.APPLICATION_JSON)
     public Response query(@PathParam("id") String userID, @PathParam("dbid") String dbID, @QueryParam("pattern") String pattern, @QueryParam("page") int page, @DefaultValue("50") @QueryParam("perpage") int perpage) {
     	
-    	Optional<Query_DTO> dto = impl.makeQuery(userID, pattern, dbID, page, perpage);
+    	
+    	String patternDecoded = null;
+    	
+    	try {
+			patternDecoded = URLDecoder.decode(pattern, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			
+			e.printStackTrace();
+		}
+    	
+    	Optional<Query_DTO> dto = impl.makeQuery(userID, patternDecoded, dbID, page, perpage);
     	
     	if (dto.isPresent()) {
     		return Response.ok(dto.get()).build();
