@@ -159,15 +159,28 @@ public class SQLUserDAO implements IUserDAO
 	}
 
 	@Override
-	public void addMrQueue(String dbID) {
+	public void addMrQueue(String dbID, String userID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public boolean hasUserDBAccess(String userID, String bdID) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void updateMrQueue(String dbID, int status) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void removeMrQueue(String dbID) {
+	public int getMrStatus(String dbID, String userID) {
 		// TODO Auto-generated method stub
-		
+		return 0;
 	}
 
 }

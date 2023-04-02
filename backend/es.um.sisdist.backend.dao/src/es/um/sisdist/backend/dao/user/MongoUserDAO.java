@@ -37,10 +37,6 @@ import es.um.sisdist.backend.dao.models.utils.UserUtils;
 import es.um.sisdist.backend.dao.utils.Lazy;
 
 
-/**
- * @author dsevilla
- *
- */
 public class MongoUserDAO implements IUserDAO
 {
     private Supplier<MongoCollection<User>> collection;
@@ -197,7 +193,15 @@ public class MongoUserDAO implements IUserDAO
 		
 		return Optional.of(DB);
 	}
-
+	
+	@Override
+	public boolean hasUserDBAccess(String userID, String bdID) {
+		
+		Optional<User> u = getUserById(userID);
+		
+		return (u.isPresent() && u.get().getBbdd().contains(bdID));
+	}
+	
 	@Override
 	public Optional<Userdb> getDatabases(String userID, String bdID) {
 		
@@ -418,17 +422,29 @@ public class MongoUserDAO implements IUserDAO
 	}
 
 	@Override
-	public void addMrQueue(String dbID) {
+	public void addMrQueue(String dbID, String userID) {
 		
 		Document doc = new Document();
 		doc.append("dbID", dbID);
 		doc.append("status", 0);
+		doc.append("user", userID);
 		mrQueue.get().insertOne(doc);
 	}
 
 	@Override
-	public void removeMrQueue(String dbID) {
+	public void updateMrQueue(String dbID, int status) {
 		
-		mrQueue.get().updateOne(eq("dbID", dbID), set("status", 1));
+		mrQueue.get().updateOne(eq("dbID", dbID), set("status", status));
+	}
+
+	@Override
+	public int getMrStatus(String dbID, String userID) {
+		
+		Document doc = mrQueue.get().find(eq("dbID", dbID)).first();
+		
+		if (doc != null && doc.getString("user").equals(userID))
+			return doc.getInteger("status");
+		
+		return -1;
 	}
 }

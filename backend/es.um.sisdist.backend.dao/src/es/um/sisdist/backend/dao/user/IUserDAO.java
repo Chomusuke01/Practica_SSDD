@@ -35,7 +35,11 @@ public interface IUserDAO
     
     public Optional<Userdb> getUserDBByIDRAW(String userID, String dbID);
     
-    public void addMrQueue(String dbID);
+    public void addMrQueue(String dbID, String userID);
     
-    public void removeMrQueue(String dbID);
+    public void updateMrQueue(String dbID, int status);
+    
+    public int getMrStatus(String dbID, String userID);
+    
+    public boolean hasUserDBAccess(String userID, String bdID);
 }

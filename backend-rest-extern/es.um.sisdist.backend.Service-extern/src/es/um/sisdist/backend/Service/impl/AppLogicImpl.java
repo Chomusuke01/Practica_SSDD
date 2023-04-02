@@ -73,9 +73,14 @@ public class AppLogicImpl
         return dao.getUserById(userId);
     }
 
-    public void mapReduce(String userID, String out_db, String map, String reduce, String in_db) {
+    public boolean mapReduce(String userID, String out_db, String map, String reduce, String in_db) {
     	
-    	dao.addMrQueue(out_db);
+    	if (!dao.hasUserDBAccess(userID, in_db)) 
+    		return false;
+    	
+    	dao.addMrQueue(out_db, userID);
+    	
+    	logger.info("Se llama al procedimiento desde REST");
     	
     	var mapReduceRequest = MapReduceRequest.newBuilder().setInDb(in_db).setMap(map).setReduce(reduce).setOutDb(out_db).setUserID(userID).build();
     	 
@@ -83,12 +88,14 @@ public class AppLogicImpl
 			
 			@Override
 			public void onNext(MapReduceResponse value) {
-				dao.removeMrQueue(out_db);
+				logger.info("Se ha recibido la respuesta");
+				dao.updateMrQueue(value.getMrID(), 1);
 			}
 			
 			@Override
 			public void onError(Throwable t) {
 				logger.warning("Fallo al llamar al método remoto");
+				
 			}
 			
 			@Override
@@ -96,8 +103,14 @@ public class AppLogicImpl
 			
 			}
 		});
+    	
+    	return true;
     }
-
+    
+    public int getMrStatus(String mrID, String userID) {
+    	
+    	return dao.getMrStatus(mrID, userID);
+    }
     // El frontend, a través del formulario de login,
     // envía el usuario y pass, que se convierte a un DTO. De ahí
     // obtenemos la consulta a la base de datos, que nos retornará,

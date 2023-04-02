@@ -33,7 +33,7 @@ class GrpcServiceImpl extends GrpcServiceGrpc.GrpcServiceImplBase
 	public void mapReduce(MapReduceRequest request, StreamObserver<MapReduceResponse> responseObserver)
     {
     	logger.info("Se ha recibido una nueva petición map-reduce");
-    	
+
 		MapReduceApply mapReduceApply = new MapReduceApply(JSchemeProvider.js(), request.getMap(), request.getReduce());
 		
 		Optional<Userdb> userdb = dao.getUserdbById(request.getInDb());
@@ -50,9 +50,9 @@ class GrpcServiceImpl extends GrpcServiceGrpc.GrpcServiceImplBase
 			
 			db_out.add(new KeyValue(k, result.get(k)));
 		}
-		
+
 		dao.newBBDD(request.getUserID(), request.getOutDb(), db_out);
-		
+		logger.info("Se ha completado la peticion map reduce. Se envia respuesta");
 		responseObserver.onNext(MapReduceResponse.newBuilder().setMrID(request.getOutDb()).build());
 		responseObserver.onCompleted();
 	}
