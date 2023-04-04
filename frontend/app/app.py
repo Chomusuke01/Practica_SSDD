@@ -1,7 +1,9 @@
 from flask import Flask, render_template, send_from_directory, url_for, request, redirect
 from flask_login import LoginManager, login_manager, current_user, login_user, login_required, logout_user
+from hashlib import md5
 import requests, json
 import urllib.parse as encoder
+from datetime import datetime
 
 # Usuarios
 from models import users, User
@@ -20,6 +22,7 @@ app.config['SECRET_KEY'] = 'qH1vprMjavek52cv7Lmfe1FoCexrrV8egFnB21jHhkuOHm8hJUe1
 lista = ["a","b"]
 
 backendURL = "backend-rest:8080"
+backendURLExt = "backend-rest-extern:8180"
 @app.route('/static/<path:path>')
 def serve_static(path):
     return send_from_directory('static', path)
@@ -46,7 +49,7 @@ def login():
 
                 responseData = response.json() 
                 user = User(responseData["id"], responseData["name"], form.email.data.encode('utf-8'), ## Preguntar campos user
-                            form.password.data.encode('utf-8'))
+                            form.password.data.encode('utf-8'), responseData["token"])
                 users.append(user)
                 login_user(user, remember=form.remember_me.data)
                 return redirect(url_for('index'))
@@ -69,8 +72,7 @@ def register():
                 "email": form.email.data,
                 "id": form.username.data,
                 "name": form.name.data,
-                "password": form.password.data,
-                "token": "testToken"
+                "password": form.password.data
             }
 
             response = requests.post("http://" + backendURL + "/Service/u", json=data) 
@@ -129,6 +131,38 @@ def showDatabase():
             return render_template('showDatabase.html', dbName=content['dbname'], databaseContent=content['d'])
     
     return render_template('showDatabase.html', dbName=None)
+
+@app.route('/mrRequest', methods=['POST', 'GET'])
+@login_required
+def mrRequest():
+
+    if request.method == "POST":
+
+        data = {
+            "map": request.form["map"],
+            "reduce": request.form["reduce"],
+            "out_db": request.form["out_db"]
+        }
+        date = datetime.now().isoformat()
+        url = "http://{}/Service-extern/u/{}/db/{}/mr".format(backendURLExt,current_user.id, request.form['in_db'])
+        authToken = md5((url+date+current_user.token).encode()).hexdigest()
+        headers = {
+            "Date": date,
+            "User": current_user.id,
+            "Auth-Token": authToken
+        }
+
+        response = requests.post(url, json=data, headers=headers)
+
+        if response.status_code == 202:
+            
+            content = response.json()
+
+            return render_template('mapreduce.html', result="Petición lanzanda con exito en {}".format(response.headers["Location"]))
+        if response.status_code == 401:
+            return render_template('mapreduce.html', result="Fallo de autenticacion")
+        
+    return render_template('mapreduce.html', result=None)
 
 
 @app.route('/addKey', methods=['POST', 'GET'])

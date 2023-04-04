@@ -128,4 +128,18 @@ public class AppLogicImpl
 
         return Optional.empty();
     }
+    
+    public boolean authentication(String date, String url, String token, String id) {
+    	Optional<User> u = getUserById(id);
+    	if (u.isPresent())
+        {
+    		logger.info("URL: "+url);
+    		logger.info("Fecha: "+date);
+    		String authToken = url+date+u.get().getToken();
+    		authToken = UserUtils.md5pass(authToken);
+    		return (authToken.equals(token));
+        }
+        
+    	return false;
+    }
 }

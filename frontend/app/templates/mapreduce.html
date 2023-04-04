@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!doctype html>
+<html>
+  <body>
+    {% if not result %}
+      <form method="post" action="{{ url_for('mrRequest') }}">
+        <div class="field">
+            <div class="control">
+                <input class="input is-large" name="map" placeholder="Map function" >
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <input class="input is-large" name="reduce" placeholder="Reduce function" >
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <input class="input is-large" name="in_db" placeholder="Entry Database" >
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <input class="input is-large" name="out_db" placeholder="Output Database" >
+            </div>
+        </div>
+
+        <input type="submit" value="Enviar">
+      </form>
+      {% else %}
+      <h2>{{ result }}</h2>
+      
+      {% endif %}
+  </body>
+</html>
+{% endblock %}
