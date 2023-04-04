@@ -145,7 +145,7 @@ def mrRequest():
         }
         date = datetime.now().isoformat()
         url = "http://{}/Service-extern/u/{}/db/{}/mr".format(backendURLExt,current_user.id, request.form['in_db'])
-        authToken = md5((url+date+current_user.token).encode()).hexdigest()
+        authToken = md5((url + date + current_user.token).encode()).hexdigest()
         headers = {
             "Date": date,
             "User": current_user.id,
@@ -156,10 +156,10 @@ def mrRequest():
 
         if response.status_code == 202:
             
-            content = response.json()
-
             return render_template('mapreduce.html', result="Petición lanzanda con exito en {}".format(response.headers["Location"]))
+
         if response.status_code == 401:
+
             return render_template('mapreduce.html', result="Fallo de autenticacion")
         
     return render_template('mapreduce.html', result=None)
