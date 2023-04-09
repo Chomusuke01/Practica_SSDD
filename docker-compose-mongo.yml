@@ -1,8 +1,8 @@
-version: '3.1'
+version: '3'
 services:
 
   ssdd-frontend:
-    build: frontend/.
+    image: 127.0.0.1:5000/dsevilla/ssdd-frontend
     ports:
       - 5001:5000
     env_file: mongo.env
@@ -11,7 +11,7 @@ services:
       - FLASK_DEBUG=true
 
   db-mongo:
-    build: db-mongo/.
+    image: mongo:latest
     restart: always
     ports:
       - 27017:27017 
@@ -22,19 +22,19 @@ services:
       - MONGO_INITDB_DATABASE=ssdd
 
   backend-rest:
-    build: backend-rest/es.um.sisdist.backend.Service/.
+    image: 127.0.0.1:5000/dsevilla/ssdd-backend-rest
     ports:
       - 8080:8080
     env_file: mongo.env
 
   backend-rest-extern:
-    build: backend-rest-extern/es.um.sisdist.backend.Service-extern/.
+    image: 127.0.0.1:5000/dsevilla/ssdd-backend-rest-extern
     ports:
       - 8180:8180
     env_file: mongo.env
     
   backend-grpc:
-    build: backend-grpc/es.um.sisdist.backend.grpc.GrpcServiceImpl/.
+    image: 127.0.0.1:5000/dsevilla/ssdd-backend-grpc
     ports:
       - 50051:50051
     env_file: mongo.env
