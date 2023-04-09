@@ -17,3 +17,9 @@ class RegisterForm(FlaskForm):
 class NewDatabaseForm(FlaskForm):
     databaseName = StringField('newDatabaseName', validators=[InputRequired()])
     databaseContent = StringField('databaseContent', validators=[InputRequired()])
+
+class MRForm(FlaskForm):
+    map = StringField('map', validators=[DataRequired()])
+    reduce = StringField('reduce', validators=[DataRequired()])
+    in_db = StringField('in_db', validators=[DataRequired()])
+    out_db = StringField('out_db', validators=[DataRequired()])

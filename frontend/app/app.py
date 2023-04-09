@@ -9,7 +9,7 @@ from datetime import datetime
 from models import users, User
 
 # Login
-from forms import LoginForm, RegisterForm, NewDatabaseForm
+from forms import LoginForm, RegisterForm, NewDatabaseForm, MRForm
 
 app = Flask(__name__, static_url_path='')
 login_manager = LoginManager()
@@ -136,15 +136,16 @@ def showDatabase():
 @login_required
 def mrRequest():
 
-    if request.method == "POST":
+    form = MRForm(None if request.method != 'POST' else request.form)
 
+    if request.method == "POST":
         data = {
-            "map": request.form["map"],
-            "reduce": request.form["reduce"],
-            "out_db": request.form["out_db"]
+            "map": form.map.data,
+            "reduce": form.reduce.data,
+            "out_db": form.out_db.data
         }
         date = datetime.now().isoformat()
-        url = "http://{}/Service-extern/u/{}/db/{}/mr".format(backendURLExt,current_user.id, request.form['in_db'])
+        url = "http://{}/Service-extern/u/{}/db/{}/mr".format(backendURLExt,current_user.id, form.in_db.data)
         authToken = md5((url + date + current_user.token).encode()).hexdigest()
         headers = {
             "Date": date,
