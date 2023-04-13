@@ -13,12 +13,21 @@ public class User
     private String email;
     private String password_hash;
     private String name;
-
+    
     private String token;
     private ArrayList<String> bbdd;
     private int visits;
+    private int mrRequest;
 
-    public ArrayList<String> getBbdd(){
+    public int getMrRequest() {
+		return mrRequest;
+	}
+
+	public void setMrRequest(int mrRequest) {
+		this.mrRequest = mrRequest;
+	}
+
+	public ArrayList<String> getBbdd(){
     	return new ArrayList<>(bbdd);
     }
     
@@ -122,13 +131,13 @@ public class User
         this.visits = visits;
     }
 
-    public User(String email, String password_hash, String name, String tOKEN, int visits)
+    public User(String email, String password_hash, String name, String tOKEN, int visits, int mrRequest)
     {
-        this(email, email, password_hash, name, tOKEN, visits);
+        this(email, email, password_hash, name, tOKEN, visits, mrRequest);
         this.id = UserUtils.md5pass(email);
     }
 
-    public User(String id, String email, String password_hash, String name, String tOKEN, int visits)
+    public User(String id, String email, String password_hash, String name, String tOKEN, int visits, int mrRequest)
     {
         this.id = id;
         this.email = email;
@@ -137,6 +146,7 @@ public class User
         token = tOKEN;
         this.visits = visits;
         this.bbdd = new ArrayList<>();
+        this.mrRequest = mrRequest;
     }
 
     @Override

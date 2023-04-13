@@ -79,6 +79,7 @@ public class AppLogicImpl
     		return false;
     	
     	dao.addMrQueue(out_db, userID);
+    	dao.updateMrRequest(userID);
     	
     	logger.info("Se llama al procedimiento desde REST");
     	

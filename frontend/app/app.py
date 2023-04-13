@@ -19,7 +19,6 @@ login_manager.init_app(app) # Para mantener la sesión
 # Python ofrece varias formas de almacenar esto de forma segura, que
 # no cubriremos aquí.
 app.config['SECRET_KEY'] = 'qH1vprMjavek52cv7Lmfe1FoCexrrV8egFnB21jHhkuOHm8hJUe1hwn7pKEZQ1fioUzDb3sWcNK1pJVVIhyrgvFiIrceXpKJBFIn_i9-LTLBCc4cqaI3gjJJHU6kxuT8bnC7Ng'
-lista = ["a","b"]
 
 backendURL = "backend-rest:8080"
 backendURLExt = "backend-rest-extern:8180"
@@ -48,7 +47,7 @@ def login():
             if response.status_code == 200:
 
                 responseData = response.json() 
-                user = User(responseData["id"], responseData["name"], form.email.data.encode('utf-8'), ## Preguntar campos user
+                user = User(responseData["id"], responseData["name"], responseData["email"], ## Preguntar campos user
                             form.password.data.encode('utf-8'), responseData["token"])
                 users.append(user)
                 login_user(user, remember=form.remember_me.data)
@@ -127,8 +126,8 @@ def showDatabase():
         if response.status_code == 200:
 
             content = response.json()
-
-            return render_template('showDatabase.html', dbName=content['dbname'], databaseContent=content['d'])
+            #result=json.dumps(response.json()['d'], indent=2)
+            return render_template('showDatabase.html', dbName=content['dbname'], databaseContent=json.dumps(content['d'], indent=2))
     
     return render_template('showDatabase.html', dbName=None)
 
@@ -165,6 +164,40 @@ def mrRequest():
         
     return render_template('mapreduce.html', result=None)
 
+
+@app.route('/mrStatus', methods=['POST', 'GET'])
+@login_required
+def mrStatus():
+
+    if request.method == "POST":
+
+        date = datetime.now().isoformat()
+        url = "http://{}/Service-extern/u/{}/db/{}/mr/{}".format(backendURLExt,current_user.id, request.form['dbName'], request.form['mrID'])
+        authToken = md5((url + date + current_user.token).encode()).hexdigest()
+
+        headers = {
+            "Date": date,
+            "User": current_user.id,
+            "Auth-Token": authToken
+        }
+
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+
+            responseData = response.json()
+
+            if responseData["status"] == 1:
+
+                return render_template('mrStatus.html', result="La petición se ha completado")
+            
+            return render_template('mrStatus.html', result="La petición se está procesando")
+        
+        if response.status_code == 401:
+
+            return render_template('mrStatus.html', result="Fallo de autenticación")
+    
+    return render_template('mrStatus.html', result=None)
 
 @app.route('/addKey', methods=['POST', 'GET'])
 @login_required
@@ -237,29 +270,14 @@ def makeQuery():
 
     return render_template('query.html', result=None)
 
-
-@app.route('/postbd', methods=['POST'])
-@login_required 
-def postdb():
-    #añadir la bbdd en el backend
-    database = request.form['newDatabase']
-    
-    lista.append(database)
-    return redirect(url_for('bbdd'))
-
-@app.route('/deletedb', methods=['POST'])
-@login_required
-def deletedb():
-
-    database = request.form['deleteDatabase']
-    lista.remove(database)
-    return redirect(url_for('bbdd'))
-
-
 @app.route('/profile')
 @login_required
 def profile():
-    return render_template('profile.html')
+
+    response = requests.get("http://{}/Service/u/{}".format(backendURL, current_user.email))
+    respondeData = response.json()
+
+    return render_template('profile.html', visitas=respondeData["visits"], nBD=len(respondeData["bbdd"]), nMR=respondeData["mrRequest"])
 
 @app.route('/logout')
 @login_required

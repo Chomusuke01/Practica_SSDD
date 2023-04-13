@@ -13,6 +13,7 @@ public class UserDTO
     private String token;
 
     private int visits;
+    private int mrRequest;
 
     /**
      * @return the id
@@ -22,7 +23,15 @@ public class UserDTO
         return id;
     }
 
-    /**
+    public int getMrRequest() {
+		return mrRequest;
+	}
+
+	public void setMrRequest(int mrRequest) {
+		this.mrRequest = mrRequest;
+	}
+
+	/**
      * @param id the id to set
      */
     public void setId(String id)
@@ -110,7 +119,7 @@ public class UserDTO
         this.visits = visits;
     }
 
-    public UserDTO(String id, String email, String password, String name, String tOKEN, int visits)
+    public UserDTO(String id, String email, String password, String name, String tOKEN, int visits, int mrRequest)
     {
         super();
         this.id = id;
@@ -119,6 +128,7 @@ public class UserDTO
         this.name = name;
         token = tOKEN;
         this.visits = visits;
+        this.mrRequest = mrRequest;
     }
 
     public UserDTO()

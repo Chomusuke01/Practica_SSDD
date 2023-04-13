@@ -46,19 +46,5 @@
     </tr>
       
     </table>
-    &nbsp;
-    <div class="form-floating">
-        <form action = "{{url_for('postdb')}}" method="post">
-            <input type="text" name="newDatabase"  placeholder="New data base name">
-            <input type = "submit">
-        </form>
-    </div>
-    &nbsp;
-    <div class="form-floating">
-        <form action = "{{url_for('deletedb')}}" method="post">
-            <input type="text" name="deleteDatabase"  placeholder="Database to delete">
-            <input type = "submit">
-        </form>
-    </div>
 
     {%endblock %}

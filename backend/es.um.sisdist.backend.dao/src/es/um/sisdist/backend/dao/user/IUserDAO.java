@@ -42,4 +42,6 @@ public interface IUserDAO
     public int getMrStatus(String dbID, String userID);
     
     public boolean hasUserDBAccess(String userID, String bdID);
+    
+    public void updateMrRequest (String userID);
 }

@@ -14,8 +14,7 @@
     {% else %}
 
         <h1>Contenido de la base de datos {{ dbName }}</h1>
-        <pre>{{ databaseContent }}</pre>
-
+        <textarea rows="20" cols="50" readonly>{{ databaseContent }}</textarea>
     {% endif %}
   </body>
 </html>

@@ -85,7 +85,7 @@ public class SQLUserDAO implements IUserDAO
                     result.getString(3), // pwhash
                     result.getString(4), // name
                     result.getString(5), // token
-                    result.getInt(6))); // visits
+                    result.getInt(6),0)); // visits
         } catch (SQLException e)
         {
             return Optional.empty();
@@ -181,6 +181,12 @@ public class SQLUserDAO implements IUserDAO
 	public int getMrStatus(String dbID, String userID) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public void updateMrRequest(String userID) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

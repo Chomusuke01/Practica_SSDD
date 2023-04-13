@@ -8,6 +8,7 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.regex;
 import static com.mongodb.client.model.Updates.set;
 import static com.mongodb.client.model.Updates.push;
+import static com.mongodb.client.model.Updates.inc;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 import org.bson.codecs.pojo.Conventions;
@@ -95,7 +96,7 @@ public class MongoUserDAO implements IUserDAO
 			return Optional.empty();
 		}
 		
-		User u = new User(id, email, UserUtils.md5pass(password), name, UserUtils.md5pass(id), 0);
+		User u = new User(id, email, UserUtils.md5pass(password), name, UserUtils.md5pass(id), 0, 0);
 		
 		collection.get().insertOne(u);
 		
@@ -446,5 +447,12 @@ public class MongoUserDAO implements IUserDAO
 			return doc.getInteger("status");
 		
 		return -1;
+	}
+
+	@Override
+	public void updateMrRequest(String userID) {
+		
+		collection.get().updateOne(eq("id", userID), inc("mrRequest", 1));
+		
 	}
 }

@@ -13,8 +13,17 @@ public class UserDTO
     private String name;
     private ArrayList<String> bbdd;
     private String token;
+    private int mrRequest;
     
-    private int visits;
+    public int getMrRequest() {
+		return mrRequest;
+	}
+
+	public void setMrRequest(int mrRequest) {
+		this.mrRequest = mrRequest;
+	}
+
+	private int visits;
 
     
     public ArrayList<String> getBbdd(){
@@ -121,7 +130,7 @@ public class UserDTO
         this.visits = visits;
     }
 
-    public UserDTO(String id, String email, String password, String name, String tOKEN, int visits, ArrayList<String> bbdd)
+    public UserDTO(String id, String email, String password, String name, String tOKEN, int visits, ArrayList<String> bbdd, int mrRequest)
     {
         super();
         this.id = id;
@@ -131,6 +140,7 @@ public class UserDTO
         token = tOKEN;
         this.visits = visits;
         this.bbdd = new ArrayList<>(bbdd);
+        this.mrRequest = mrRequest;
     }
 
     public UserDTO()

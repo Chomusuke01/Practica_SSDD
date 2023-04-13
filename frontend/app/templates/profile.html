@@ -1,7 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="title">
-    Welcome, {{current_user.name}}!! {{current_user.email}}
+<h1>
+    Información del usuario
 </h1>
+
+<b>ID</b>: {{current_user.id}}
+&nbsp;
+<b>Name</b>: {{current_user.name}}
+&nbsp;
+<b>Email</b>: {{current_user.email}}
+&nbsp;
+<b>Visitas</b>: {{visitas}}
+&nbsp;
+<b>Bases de datos</b>: {{nBD}}
+&nbsp;
+<b>Peticiones MR</b>: {{nMR}}
 {% endblock %}
