@@ -6,6 +6,7 @@
   <body>
     {% if not result %}
       <form method="post" action="{{ url_for('makeQuery') }}">
+        {{ form.hidden_tag() }}
         <div class="field">
             <div class="control">
                 <input class="input is-large" name="db" placeholder="Database" >

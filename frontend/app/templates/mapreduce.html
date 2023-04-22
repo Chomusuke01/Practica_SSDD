@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!doctype html>
-<html>
-  <body>
+
+  <main class="form-mr">
     {% if not result %}
       <form method="post" action="{{ url_for('mrRequest') }}">
+        {{ form.hidden_tag() }}
         <div class="field">
             <div class="control">
                 <input type="text" name="map" placeholder="Map function" >
@@ -33,6 +33,6 @@
       <h2>{{ result }}</h2>
       
       {% endif %}
-  </body>
-</html>
+  </main>
+
 {% endblock %}

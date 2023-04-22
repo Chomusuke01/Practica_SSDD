@@ -6,6 +6,7 @@
   <body>
     {% if not result %}
       <form method="post" action="{{ url_for('mrStatus') }}">
+        {{ form.hidden_tag() }}
         <div class="field">
             <div class="control">
                 <input type="text" name="dbName" placeholder="Database" >

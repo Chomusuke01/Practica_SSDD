@@ -8,11 +8,15 @@
   <body>
     <h1>Contenido de la base de datos</h1>
     <form method="post" action="{{ url_for('newDatabase') }}">
+      {{ form.hidden_tag() }}
       <input type="text" name="newDatabaseName"  placeholder="New data base name">
       <textarea name="databaseContent" rows="20" cols="50"></textarea>
       <br>
       <input type="submit" value="Enviar">
     </form>
+    {% if error %}
+    <p class="error"><strong>Error:</strong> {{ error }}</p>
+   {% endif %}
   </body>
 </html>
 {% endblock %}

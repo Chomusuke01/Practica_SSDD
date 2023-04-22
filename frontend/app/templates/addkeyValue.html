@@ -6,6 +6,7 @@
   <body>
     {% if not result %}
       <form method="post" action="{{ url_for('addKey') }}">
+          {{ form.hidden_tag() }}
           <input type="text" name="dbName"  placeholder="Database name">
           <input type="text" name="key"  placeholder="New key">
           <input type="text" name="value"  placeholder="New value">

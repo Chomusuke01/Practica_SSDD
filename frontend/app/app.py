@@ -9,7 +9,7 @@ from datetime import datetime
 from models import users, User
 
 # Login
-from forms import LoginForm, RegisterForm, NewDatabaseForm, MRForm
+from forms import LoginForm, RegisterForm, NewDatabaseForm, MRForm, ShowDatabaseForm, MRStatusForm, NewKeyForm, GetValueForm, DeleteKeyForm, QueryForm
 
 app = Flask(__name__, static_url_path='')
 login_manager = LoginManager()
@@ -98,14 +98,22 @@ def bbdd():
 def newDatabase():
 
     form = NewDatabaseForm(None if request.method != 'POST' else request.form)
-    if request.method == "POST":
+
+    if request.method == "POST" and form.validate():
         
         dbData = request.form['databaseContent']
         dbName = request.form['newDatabaseName']
 
+        dbContent = None
+
+        try: 
+            dbContent = json.loads(dbData)
+        except:
+            return render_template('inputDB.html', form=form, error="El contenido debe estar en formato JSON")
+
         data = {
             "dbname": dbName,
-            "d": json.loads(dbData)
+            "d": dbContent
         }
 
         response = requests.post("http://{}/Service/u/{}/db".format(backendURL, current_user.id), json=data)
@@ -119,7 +127,9 @@ def newDatabase():
 @login_required
 def showDatabase():
 
-    if request.method == "POST":
+    form = ShowDatabaseForm(None if request.method != 'POST' else request.form)
+
+    if request.method == "POST" and form.validate():
 
         response = requests.get("http://{}/Service/u/{}/db/{}".format(backendURL, current_user.id, request.form['DatabaseName']))
 
@@ -129,7 +139,7 @@ def showDatabase():
             #result=json.dumps(response.json()['d'], indent=2)
             return render_template('showDatabase.html', dbName=content['dbname'], databaseContent=json.dumps(content['d'], indent=2))
     
-    return render_template('showDatabase.html', dbName=None)
+    return render_template('showDatabase.html', dbName=None, form=form)
 
 @app.route('/mrRequest', methods=['POST', 'GET'])
 @login_required
@@ -137,7 +147,7 @@ def mrRequest():
 
     form = MRForm(None if request.method != 'POST' else request.form)
 
-    if request.method == "POST":
+    if request.method == "POST" and form.validate():
         data = {
             "map": form.map.data,
             "reduce": form.reduce.data,
@@ -162,14 +172,16 @@ def mrRequest():
 
             return render_template('mapreduce.html', result="Fallo de autenticacion")
         
-    return render_template('mapreduce.html', result=None)
+    return render_template('mapreduce.html', result=None, form=form)
 
 
 @app.route('/mrStatus', methods=['POST', 'GET'])
 @login_required
 def mrStatus():
 
-    if request.method == "POST":
+    form = MRStatusForm(None if request.method != 'POST' else request.form)
+
+    if request.method == "POST" and form.validate():
 
         date = datetime.now().isoformat()
         url = "http://{}/Service-extern/u/{}/db/{}/mr/{}".format(backendURLExt,current_user.id, request.form['dbName'], request.form['mrID'])
@@ -197,13 +209,15 @@ def mrStatus():
 
             return render_template('mrStatus.html', result="Fallo de autenticación")
     
-    return render_template('mrStatus.html', result=None)
+    return render_template('mrStatus.html', result=None, form=form)
 
 @app.route('/addKey', methods=['POST', 'GET'])
 @login_required
 def addKey():
 
-    if request.method == "POST":
+    form = NewKeyForm(None if request.method != 'POST' else request.form)
+
+    if request.method == "POST" and form.validate():
 
         response = requests.put("http://{}/Service/u/{}/db/{}/d/{}?v={}".format(backendURL, 
         current_user.id, request.form['dbName'], request.form['key'], request.form['value']))
@@ -214,13 +228,15 @@ def addKey():
         
         return render_template('addkeyValue.html', result="Fallo al añadir la clave")
     
-    return render_template('addkeyValue.html', result=None)
+    return render_template('addkeyValue.html', result=None, form=form)
 
 @app.route('/getValue', methods=['POST', 'GET'])
 @login_required
 def getValue():
 
-    if request.method == "POST":
+    form = GetValueForm(None if request.method != 'POST' else request.form)
+
+    if request.method == "POST" and form.validate():
 
         response = requests.get("http://{}/Service/u/{}/db/{}/d/{}".format(backendURL, 
         current_user.id, request.form['dbName'], request.form['key']))
@@ -232,14 +248,16 @@ def getValue():
 
         return render_template('showKeyValue.html', result="Fallo al encontrar la clave")
 
-    return render_template('showKeyValue.html', result=None)
+    return render_template('showKeyValue.html', result=None, form=form)
 
 
 @app.route('/deleteKey', methods=['POST', 'GET'])
 @login_required
 def deleteKey():
 
-    if request.method == "POST":
+    form = DeleteKeyForm(None if request.method != 'POST' else request.form)
+
+    if request.method == "POST" and form.validate():
         
         response = requests.delete("http://{}/Service/u/{}/db/{}/d/{}".format(backendURL, 
         current_user.id, request.form['dbName'], request.form['key']))
@@ -250,14 +268,16 @@ def deleteKey():
 
         return render_template('deleteKey.html', result="Fallo al borrar la clave")
 
-    return render_template('deleteKey.html', result=None)
+    return render_template('deleteKey.html', result=None, form=form)
 
 
 @app.route('/makeQuery', methods=['POST', 'GET'])
 @login_required
 def makeQuery():
     
-    if request.method == "POST":
+    form = QueryForm(None if request.method != 'POST' else request.form)
+
+    if request.method == "POST" and form.validate():
 
         response = requests.get("http://{}/Service/u/{}/db/{}/q?pattern={}&page={}&perpage={}".format(backendURL,
         current_user.id, request.form['db'], encoder.quote(request.form['pattern']), request.form['page'], request.form['perpage']))
@@ -268,7 +288,7 @@ def makeQuery():
 
         return render_template('query.html', result="Error al procesar la petición")
 
-    return render_template('query.html', result=None)
+    return render_template('query.html', result=None, form=form)
 
 @app.route('/profile')
 @login_required

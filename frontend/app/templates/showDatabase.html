@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!doctype html>
-<html>
-  <body>
+  <main class="form-showdb">
     {% if not dbName %}
 
         <form method="post" action="{{ url_for('showDatabase') }}">
+            {{ form.hidden_tag() }}
             <input type="text" name="DatabaseName"  placeholder="Database name">
             <input type="submit" value="Enviar">
         </form>
@@ -16,6 +15,5 @@
         <h1>Contenido de la base de datos {{ dbName }}</h1>
         <textarea rows="20" cols="50" readonly>{{ databaseContent }}</textarea>
     {% endif %}
-  </body>
-</html>
+  </main>
 {% endblock %}
