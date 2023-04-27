@@ -101,7 +101,7 @@ def obtenerBBDD():
 
     response = requests.get("http://{}/Service/u/{}/db/{}".format(backendURL, user.id, dataBaseName))
 
-    return response.json() == dataBase
+    return response.status_code == 200 and response.json() == dataBase
 
 def insertarClave():
 
@@ -109,7 +109,9 @@ def insertarClave():
 
     response = requests.get("http://{}/Service/u/{}/db/{}/d/{}".format(backendURL,user.id, dataBaseName, key))
 
-    return response.status_code == 200
+    responseData = response.json()
+
+    return response.status_code == 200 and responseData['k'] == key and responseData['v'] == value
 
 def eliminarClave():
 
@@ -143,18 +145,18 @@ def lanzarMapReduce():
 
 def comprobarEstadoMR():
 
-    response = requests.get("http://{}/Service-extern/u/{}/db/{}/mr/{}".format(backendURLExt, user.id, dataBaseName, outDBName))
+    response = requests.get("http://{}/Service/u/{}/db/{}/mr/{}".format(backendURL, user.id, dataBaseName, outDBName))
 
     return response.status_code == 200
 
 def obtenerResultadoMapReduce ():
 
-    response = requests.get("http://{}/Service-extern/u/{}/db/{}/mr/{}".format(backendURLExt, user.id, dataBaseName, outDBName))
+    response = requests.get("http://{}/Service/u/{}/db/{}/mr/{}".format(backendURL, user.id, dataBaseName, outDBName))
 
     while response.json()["status"] == 0:
-        print("Procedo a esperar")
+        print("Esperando salida ...")
         sleep(3)
-        response = requests.get("http://{}/Service-extern/u/{}/db/{}/mr/{}".format(backendURLExt, user.id, dataBaseName, outDBName))
+        response = requests.get("http://{}/Service/u/{}/db/{}/mr/{}".format(backendURL, user.id, dataBaseName, outDBName))
 
     print ("Resultado Map-Reduce")
 
@@ -165,14 +167,14 @@ def obtenerResultadoMapReduce ():
 
 if __name__ == '__main__':
     
-    print("Registrar usuario: " + "Éxito" if registrarUsusario() else "Fallo")
-    print("Registrar usuario existente: " + "Éxito" if registrarUsuarioExistente() else "Fallo")
-    print("Login correcto: " + "Éxito" if loginCorrecto() else "Fallo")
-    print("Login incorrecto: " + "Éxito" if loginIncorrecto() else "Fallo")
-    print("Crear base de datos: " + "Éxito" if crearBBDD() else "Fallo")
-    print("Obtener base de datos: " + "Éxito" if obtenerBBDD() else "Fallo")
-    print("Insertar clave: " + "Éxito" if insertarClave() else "Fallo")
-    print("Eliminar clave: " + "Éxito" if eliminarClave() else "Fallo")
-    print("Lanzar MR: " + "Éxito" if lanzarMapReduce() else "Fallo")
-    print("Comprobar estado MR: " + "Éxito" if comprobarEstadoMR() else "Fallo")
+    print("Registrar usuario: " + ("Éxito" if registrarUsusario() else "Fallo"))
+    print("Registrar usuario existente: " + ("Éxito" if registrarUsuarioExistente() else "Fallo"))
+    print("Login correcto: " + ("Éxito" if loginCorrecto() else "Fallo"))
+    print("Login incorrecto: " + ("Éxito" if loginIncorrecto() else "Fallo"))
+    print("Crear base de datos: " + ("Éxito" if crearBBDD() else "Fallo"))
+    print("Obtener base de datos: " + ("Éxito" if obtenerBBDD() else "Fallo"))
+    print("Insertar clave: " + ("Éxito" if insertarClave() else "Fallo"))
+    print("Eliminar clave: " + ("Éxito" if eliminarClave() else "Fallo"))
+    print("Lanzar MR: " + ("Éxito" if lanzarMapReduce() else "Fallo"))
+    print("Comprobar estado MR: " + ("Éxito" if comprobarEstadoMR() else "Fallo"))
     obtenerResultadoMapReduce()

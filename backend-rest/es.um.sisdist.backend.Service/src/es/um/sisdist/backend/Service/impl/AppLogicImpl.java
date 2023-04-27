@@ -8,7 +8,8 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import es.um.sisdist.backend.grpc.GrpcServiceGrpc;
-
+import es.um.sisdist.backend.grpc.MapReduceRequest;
+import es.um.sisdist.backend.grpc.MapReduceResponse;
 import es.um.sisdist.models.BD_DTO;
 import es.um.sisdist.models.BD_DTOUtils;
 import es.um.sisdist.models.KeyValueDTO;
@@ -24,6 +25,7 @@ import es.um.sisdist.backend.dao.models.utils.UserUtils;
 import es.um.sisdist.backend.dao.user.IUserDAO;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.stub.StreamObserver;
 
 /**
  * @author dsevilla
@@ -37,8 +39,8 @@ public class AppLogicImpl
     private static final Logger logger = Logger.getLogger(AppLogicImpl.class.getName());
 
     private final ManagedChannel channel;
-    private final GrpcServiceGrpc.GrpcServiceBlockingStub blockingStub;
-    //private final GrpcServiceGrpc.GrpcServiceStub asyncStub;
+    //private final GrpcServiceGrpc.GrpcServiceBlockingStub blockingStub;
+    private final GrpcServiceGrpc.GrpcServiceStub asyncStub;
 
     static AppLogicImpl instance = new AppLogicImpl();
 
@@ -60,7 +62,8 @@ public class AppLogicImpl
                 // Channels are secure by default (via SSL/TLS). For the example we disable TLS
                 // to avoid needing certificates.
                 .usePlaintext().build();
-        blockingStub = GrpcServiceGrpc.newBlockingStub(channel);
+        // blockingStub = GrpcServiceGrpc.newBlockingStub(channel);
+        asyncStub = GrpcServiceGrpc.newStub(channel);
         //asyncStub = GrpcServiceGrpc.newStub(channel);
     }
 
@@ -144,4 +147,45 @@ public class AppLogicImpl
     	if (values.isPresent()) return Optional.of(Query_DTOUtils.toDTO(dbID, pattern, page, perpage, values.get()));
     	return Optional.empty();
     }
+    
+    public boolean mapReduce(String userID, String out_db, String map, String reduce, String in_db) {
+    	
+    	if (!dao.hasUserDBAccess(userID, in_db)) 
+    		return false;
+    	
+    	dao.addMrQueue(out_db, userID);
+    	dao.updateMrRequest(userID);
+    	
+    	logger.info("Se llama al procedimiento desde REST");
+    	
+    	var mapReduceRequest = MapReduceRequest.newBuilder().setInDb(in_db).setMap(map).setReduce(reduce).setOutDb(out_db).setUserID(userID).build();
+    	 
+    	asyncStub.mapReduce(mapReduceRequest, new StreamObserver<MapReduceResponse>() {
+			
+			@Override
+			public void onNext(MapReduceResponse value) {
+				logger.info("Se ha recibido la respuesta");
+				dao.updateMrQueue(value.getMrID(), 1);
+			}
+			
+			@Override
+			public void onError(Throwable t) {
+				logger.warning("Fallo al llamar al método remoto");
+				
+			}
+			
+			@Override
+			public void onCompleted() {
+			
+			}
+		});
+    	
+    	return true;
+    }
+    public int getMrStatus(String mrID, String userID) {
+    	
+    	return dao.getMrStatus(mrID, userID);
+    }
+    
+    
 }
